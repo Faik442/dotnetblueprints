@@ -1,5 +1,7 @@
 ﻿using DotnetBlueprints.Sales.Domain.Enums;
+using DotnetBlueprints.SharedKernel.Audit;
 using DotnetBlueprints.SharedKernel.Domain;
+using DotnetBlueprints.SharedKernel.Exceptions;
 
 namespace DotnetBlueprints.Sales.Domain.Entities;
 
@@ -9,16 +11,19 @@ namespace DotnetBlueprints.Sales.Domain.Entities;
 /// </summary>
 public class Offer : BaseEntity
 {
+    [Auditable]
     /// <summary>
     /// Gets the title or name of the offer.
     /// </summary>
     public string Title { get; private set; }
 
+    [Auditable]
     /// <summary>
     /// Gets the date until which the offer is valid.
     /// </summary>
     public DateTime ValidUntil { get; private set; }
 
+    [Auditable]
     /// <summary>
     /// Gets the current status of the offer, such as Draft, Sent, or Accepted.
     /// </summary>
@@ -34,15 +39,33 @@ public class Offer : BaseEntity
     /// </summary>
     public decimal TotalPrice => Items.Sum(i => i.Total);
 
+    [Auditable]
+    /// <summary>
+    /// Indicates whether the offer has been soft-deleted.
+    /// </summary>
+    public bool IsDeleted { get; private set; } = false;
+
+    /// <summary>
+    /// The date and time when the offer was deleted, if applicable.
+    /// </summary>
+    public DateTime? DeletedAt { get; private set; }
+
+    /// <summary>
+    /// The user or process who deleted the offer, if applicable.
+    /// </summary>
+    public string? DeletedBy { get; private set; }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Offer"/> class with a title and validity date.
     /// </summary>
     /// <param name="title">The title of the offer.</param>
     /// <param name="validUntil">The expiration date of the offer.</param>
-    public Offer(string title, DateTime validUntil)
+    public Offer(string title, DateTime validUntil, string? createdBy)
     {
         Title = title;
         ValidUntil = validUntil;
+        if (createdBy != null)
+            CreatedBy = createdBy;
     }
 
     /// <summary>
@@ -81,5 +104,30 @@ public class Offer : BaseEntity
             throw new InvalidOperationException("Cannot revert an offer from Sent back to Draft.");
 
         Status = status;
+    }
+
+    /// <summary>
+    /// Marks the offer as soft-deleted, recording the deletion details.
+    /// </summary>
+    /// <param name="deletedBy">The user or process that deleted the offer.</param>
+    public void Delete(string deletedBy)
+    {
+        IsDeleted = true;
+        DeletedAt = DateTime.UtcNow;
+        DeletedBy = deletedBy;
+        UpdatedBy = deletedBy;
+        UpdatedDate = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Updates the validity date of the offer.
+    /// </summary>
+    /// <param name="validUntil">The new validity date.</param>
+    public void UpdateValidUntil(DateTime validUntil)
+    {
+        if (validUntil <= DateTime.UtcNow)
+            throw new ValidationException("ValidUntil must be a future date.");
+
+        ValidUntil = validUntil;
     }
 }

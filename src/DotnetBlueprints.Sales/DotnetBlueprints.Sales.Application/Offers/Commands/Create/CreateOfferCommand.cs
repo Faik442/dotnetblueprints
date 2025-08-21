@@ -24,7 +24,7 @@ public class CreateOfferCommand : IRequest<Guid>
     public DateTime ValidUntil { get; set; }
 
     /// <summary>
-    /// The list of items associated with the offer.
+    /// The user or process that creates the offer.
     /// </summary>
-    public List<OfferItem> Items { get; set; } = new();
+    public string? CreatedBy { get; set; }
 }

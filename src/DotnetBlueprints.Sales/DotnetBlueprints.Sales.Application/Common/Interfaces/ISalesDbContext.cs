@@ -1,5 +1,6 @@
 ﻿using DotnetBlueprints.Sales.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DotnetBlueprints.Sales.Application.Common.Interfaces;
 
@@ -11,7 +12,10 @@ namespace DotnetBlueprints.Sales.Application.Common.Interfaces;
 public interface ISalesDbContext
 {
     DbSet<Offer> Offers { get; }
-    DbSet<OfferStatusHistory> OfferStatusHistories { get; }
+    DbSet<Domain.Entities.OfferItem> OfferItems { get; }
+    DbSet<OutboxMessage> OutboxMessages { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
+    Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
 }

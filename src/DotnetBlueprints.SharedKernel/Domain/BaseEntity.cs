@@ -21,12 +21,12 @@ public abstract class BaseEntity<T>
     /// <summary>
     /// Gets or sets the timestamp when the entity was initially created.
     /// </summary>
-    public DateTime CreatedDate { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Gets or sets the user or process that created the entity.
     /// </summary>
-    public string CreatedBy { get; set; } = string.Empty;
+    public string CreatedBy { get; set; } = "System";
 
     /// <summary>
     /// Gets or sets the timestamp when the entity was last updated, if applicable.

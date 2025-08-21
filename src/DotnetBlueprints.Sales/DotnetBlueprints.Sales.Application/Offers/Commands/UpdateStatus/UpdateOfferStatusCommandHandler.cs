@@ -1,50 +1,66 @@
 ﻿using DotnetBlueprints.Sales.Application.Common.Interfaces;
+using DotnetBlueprints.Sales.Application.Events;
 using DotnetBlueprints.Sales.Domain.Entities;
+using DotnetBlueprints.SharedKernel.Audit;
 using DotnetBlueprints.SharedKernel.Exceptions;
+using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace DotnetBlueprints.Sales.Application.Offers.Commands.UpdateStatus;
 
 public class UpdateOfferStatusCommandHandler : IRequestHandler<UpdateOfferStatusCommand, Unit>
 {
     private readonly ISalesDbContext _context;
-    private readonly ILogger<UpdateOfferStatusCommandHandler> _logger;
+    private readonly IAuditHistoryRepository _auditRepository;
 
-    public UpdateOfferStatusCommandHandler(ISalesDbContext context, ILogger<UpdateOfferStatusCommandHandler> logger)
+    public UpdateOfferStatusCommandHandler(ISalesDbContext context, IAuditHistoryRepository auditRepository)
     {
         _context = context;
-        _logger = logger;
+        _auditRepository = auditRepository;
     }
 
+    /// <summary>
+    /// Handles the offer status update command.
+    /// </summary>
+    /// <param name="request">The update command containing offer ID, new status, and changed by information.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Unit value indicating completion.</returns>
+    /// <exception cref="NotFoundException">Thrown when the offer is not found.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the status transition is invalid.</exception>
     public async Task<Unit> Handle(UpdateOfferStatusCommand request, CancellationToken cancellationToken)
     {
         var offer = await _context.Offers.FindAsync(new object[] { request.OfferId }, cancellationToken);
 
         if (offer == null)
         {
-            _logger.LogWarning("Offer not found: {OfferId}", request.OfferId);
             throw new NotFoundException(nameof(offer), request.OfferId);
         }
 
-        try
+        using var tx = await _context.BeginTransactionAsync(cancellationToken);
+
+        var oldOffer = new Offer(offer.Title, offer.ValidUntil, offer.CreatedBy) { Id = offer.Id };
+        if (request.NewStatus != offer.Status)
         {
             offer.UpdateStatus(request.NewStatus);
         }
-        catch (InvalidOperationException ex)
+        else
         {
-            _logger.LogWarning(ex, "Invalid status transition from {FromStatus} to {ToStatus} for OfferId {OfferId}",
-                offer.Status, request.NewStatus, request.OfferId);
-            throw;
+            throw new ValueAlreadySetException(nameof(offer), offer.Status);
         }
 
-        var history = OfferStatusHistory.Create(offer.Id, offer.Status, request.NewStatus, request.ChangedBy);
-        _context.OfferStatusHistories.Add(history);
+        var auditLogs = oldOffer.GetAuditChanges(offer, request.ChangedBy);
+        foreach (var log in auditLogs)
+        {
+            _auditRepository.Add(log);
+        }
 
+        var outbox = new OutboxMessage(nameof(offer), JsonSerializer.Serialize(offer));
+        _context.OutboxMessages.Add(outbox);
         await _context.SaveChangesAsync(cancellationToken);
 
-        _logger.LogInformation("Offer {OfferId} status changed from {From} to {To}",
-            offer.Id, offer.Status, request.NewStatus);
+        await tx.CommitAsync(cancellationToken);
 
         return Unit.Value;
     }

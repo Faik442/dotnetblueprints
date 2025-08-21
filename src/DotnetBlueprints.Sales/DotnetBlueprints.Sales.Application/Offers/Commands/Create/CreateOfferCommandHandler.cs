@@ -1,6 +1,9 @@
 ﻿using DotnetBlueprints.Sales.Application.Common.Interfaces;
+using DotnetBlueprints.Sales.Domain;
 using DotnetBlueprints.Sales.Domain.Entities;
+using MassTransit;
 using MediatR;
+using System.Text.Json;
 
 namespace DotnetBlueprints.Sales.Application.Offers.Commands.Create;
 
@@ -13,15 +16,18 @@ public class CreateOfferCommandHandler : IRequestHandler<CreateOfferCommand, Gui
     }
     public async Task<Guid> Handle(CreateOfferCommand request, CancellationToken cancellationToken)
     {
-        var offer = new Offer(request.Title, request.ValidUntil);
+        var offer = new Offer(request.Title, request.ValidUntil, request.CreatedBy);
 
-        foreach (var item in request.Items)
-        {
-            offer.AddItem(item.Name, item.Quantity, item.UnitPrice);
-        }
+        using var tx = await _context.BeginTransactionAsync(cancellationToken);
 
         _context.Offers.Add(offer);
+
+        var outbox = new OutboxMessage(nameof(Offer), JsonSerializer.Serialize(offer));
+
+        _context.OutboxMessages.Add(outbox);
         await _context.SaveChangesAsync(cancellationToken);
+
+        await tx.CommitAsync(cancellationToken);
 
         return offer.Id;
     }

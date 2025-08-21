@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetBlueprints.Support.In
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetBlueprints.SharedKernel", "src\DotnetBlueprints.SharedKernel\DotnetBlueprints.SharedKernel.csproj", "{F7871225-34DE-4738-B056-2D3BAEF268FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetBlueprints.Elastic", "src\DotnetBlueprints.Elastic\DotnetBlueprints.Elastic.csproj", "{86D96C29-C2AC-4A9A-BDDB-79BF0F77C1E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,10 @@ Global
 		{F7871225-34DE-4738-B056-2D3BAEF268FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7871225-34DE-4738-B056-2D3BAEF268FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7871225-34DE-4738-B056-2D3BAEF268FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86D96C29-C2AC-4A9A-BDDB-79BF0F77C1E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86D96C29-C2AC-4A9A-BDDB-79BF0F77C1E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86D96C29-C2AC-4A9A-BDDB-79BF0F77C1E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86D96C29-C2AC-4A9A-BDDB-79BF0F77C1E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -116,5 +122,6 @@ Global
 		{A8008BB6-A55D-4E42-83BB-BC0FF0969C0F} = {A676DE94-C611-44BC-B731-1C491DE6774B}
 		{6A6C2634-9FCA-466D-8BFD-072E1D64C17D} = {A676DE94-C611-44BC-B731-1C491DE6774B}
 		{F7871225-34DE-4738-B056-2D3BAEF268FE} = {CF684A23-1655-4B4A-BBC0-3CB3E29B8C76}
+		{86D96C29-C2AC-4A9A-BDDB-79BF0F77C1E7} = {CF684A23-1655-4B4A-BBC0-3CB3E29B8C76}
 	EndGlobalSection
 EndGlobal

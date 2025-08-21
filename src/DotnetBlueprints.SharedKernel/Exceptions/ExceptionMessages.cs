@@ -11,17 +11,15 @@ namespace DotnetBlueprints.SharedKernel.Exceptions;
 /// </summary>
 public static class ExceptionMessages
 {
-    public const string EntityNotFound = "Entity \"{0}\" ({1}) was not found.";
+    public static string EntityNotFound(string entity, object value) =>
+        $"Entity \"{entity}\" ({value}) was not found.";
 
     public static string FieldRequired(string fieldName) =>
         $"The field \"{fieldName}\" is required.";
 
-    public static string InvalidFormat(string fieldName) =>
-        $"The value for \"{fieldName}\" is not in a valid format.";
-
-    public static string ValueOutOfRange(string fieldName, object min, object max) =>
-        $"The value for \"{fieldName}\" must be between {min} and {max}.";
-
     public static string InvalidEnumValue(string fieldName) =>
         $"The value of \"{fieldName}\" is not a valid option.";
+
+    public static string ValueAlreadySet(string entityName, object value) =>
+        $"The {entityName} already has the '{value}'. No update is necessary.";
 }

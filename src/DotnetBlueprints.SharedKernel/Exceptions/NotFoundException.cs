@@ -9,32 +9,16 @@ namespace DotnetBlueprints.SharedKernel.Exceptions;
 /// <summary>
 /// Exception thrown when a requested entity is not found in the system.
 /// </summary>
-public class NotFoundException : Exception
+public class NotFoundException : BaseHttpException
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NotFoundException"/> class.
-    /// </summary>
-    public NotFoundException()
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NotFoundException"/> class with a custom message.
-    /// </summary>
-    /// <param name="message">The error message.</param>
-    public NotFoundException(string message)
-        : base(message)
-    {
-    }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="NotFoundException"/> class
     /// using the name of the entity and its key.
     /// </summary>
     /// <param name="name">The name of the entity.</param>
     /// <param name="key">The key that was not found.</param>
-    public NotFoundException(string name, object key)
-        : base(string.Format(ExceptionMessages.EntityNotFound, name, key))
+    public NotFoundException(string entity, object value, string? sourceSystem = null, string? correlationId = null)
+        : base(string.Format(ExceptionMessages.EntityNotFound(entity, value)), System.Net.HttpStatusCode.NotFound, sourceSystem, correlationId)
     {
     }
 }
