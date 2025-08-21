@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotnetBlueprints.SharedKernel.Audit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,6 +38,22 @@ public abstract class BaseEntity<T>
     /// Gets or sets the user or process that last updated the entity, if applicable.
     /// </summary>
     public string? UpdatedBy { get; set; }
+
+    /// <summary>
+    /// Gets or sets the timestamp when the entity was last deleted, if applicable.
+    /// </summary>
+    public DateTime? DeletedDate { get; set; }
+
+    /// <summary>
+    /// Gets or sets the user or process that last deleted the entity, if applicable.
+    /// </summary>
+    public string? DeletedBy { get; set; }
+
+    [Auditable]
+    /// <summary>
+    ///  Indicates whether the entity is soft deleted.
+    /// </summary>
+    public bool IsDeleted { get; set; } = false;
 }
 
 /// <summary>

@@ -1,6 +1,6 @@
-﻿using DotnetBlueprints.Sales.Application.OfferItem.Create;
+﻿using DotnetBlueprints.Sales.Application.Features.OfferItem.Create;
+using DotnetBlueprints.Sales.Application.Features.OfferItem.Update;
 using DotnetBlueprints.Sales.Application.OfferItem.Delete;
-using DotnetBlueprints.Sales.Application.OfferItem.Update;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

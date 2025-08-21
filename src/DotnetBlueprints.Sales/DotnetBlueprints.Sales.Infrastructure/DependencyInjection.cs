@@ -1,14 +1,14 @@
-﻿using DotnetBlueprints.Sales.Application.Common.Interfaces;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using DotnetBlueprints.Sales.Infrastructure.Audit;
-using DotnetBlueprints.SharedKernel.Audit;
-using DotnetBlueprints.Elastic.Clients;
+﻿using DotnetBlueprints.Elastic.Clients;
 using DotnetBlueprints.Elastic.Configuration;
 using DotnetBlueprints.Elastic.Services;
+using DotnetBlueprints.Sales.Application.Common.Interfaces;
+using DotnetBlueprints.Sales.Infrastructure.Audit;
+using DotnetBlueprints.Sales.Infrastructure.Persistence;
+using DotnetBlueprints.SharedKernel.Audit;
 using MassTransit;
-using DotnetBlueprints.Sales.Infrastructure.Consumers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace DotnetBlueprints.Sales.Infrastructure;

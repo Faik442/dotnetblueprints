@@ -1,7 +1,7 @@
-using DotnetBlueprints.Sales.Application.Offers.Commands.Create;
+using DotnetBlueprints.Sales.Application.Features.Offers.Commands.Create;
+using DotnetBlueprints.Sales.Application.Features.Offers.Commands.Update;
+using DotnetBlueprints.Sales.Application.Features.Offers.Commands.UpdateStatus;
 using DotnetBlueprints.Sales.Application.Offers.Commands.Delete;
-using DotnetBlueprints.Sales.Application.Offers.Commands.Update;
-using DotnetBlueprints.Sales.Application.Offers.Commands.UpdateStatus;
 using DotnetBlueprints.Sales.Application.Offers.Queries.GetById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

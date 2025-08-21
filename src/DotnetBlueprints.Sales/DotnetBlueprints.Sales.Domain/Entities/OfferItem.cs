@@ -33,22 +33,6 @@ public class OfferItem : BaseEntity
     /// </summary>
     public decimal Total => Quantity * UnitPrice;
 
-    [Auditable]
-    /// <summary>
-    /// Indicates whether the offer has been soft-deleted.
-    /// </summary>
-    public bool IsDeleted { get; private set; } = false;
-
-    /// <summary>
-    /// The date and time when the offer was deleted, if applicable.
-    /// </summary>
-    public DateTime? DeletedAt { get; private set; }
-
-    /// <summary>
-    /// The user or process who deleted the offer, if applicable.
-    /// </summary>
-    public string? DeletedBy { get; private set; }
-
     /// <summary>
     /// Gets the identifier of the parent offer that this item belongs to.
     /// </summary>
@@ -140,7 +124,7 @@ public class OfferItem : BaseEntity
     public void Delete(string deletedBy)
     {
         IsDeleted = true;
-        DeletedAt = DateTime.UtcNow;
+        DeletedDate = DateTime.Now;
         DeletedBy = deletedBy;
     }
 }

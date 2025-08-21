@@ -1,4 +1,5 @@
 ﻿using DotnetBlueprints.Sales.Domain.Entities;
+using DotnetBlueprints.SharedKernel.Audit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 

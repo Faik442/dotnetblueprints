@@ -1,4 +1,5 @@
-﻿using DotnetBlueprints.SharedKernel.Audit;
+﻿using DotnetBlueprints.Sales.Infrastructure.Persistence;
+using DotnetBlueprints.SharedKernel.Audit;
 using System.Threading;
 using System.Threading.Tasks;
 
