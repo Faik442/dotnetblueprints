@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotnetBlueprints.Auth.Application.Company.Commands.AddRoleToCompany;
+namespace DotnetBlueprints.Auth.Application.Features.Company.Commands.AddRoleToCompany;
 
 public class AddRoleToCompanyCommandValidator : AbstractValidator<AddRoleToCompanyCommand>
 {

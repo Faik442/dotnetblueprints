@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using DotnetBlueprints.Auth.Application.Common.Interfaces;
-using DotnetBlueprints.Auth.Application.Company.Queries.GetCompanyById;
+using DotnetBlueprints.Auth.Application.Features.Company.Queries.GetCompanyById;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotnetBlueprints.Auth.Application.Company.Queries.GetCompanies;
+namespace DotnetBlueprints.Auth.Application.Features.Company.Queries.GetCompanies;
 
 /// <summary>
 /// Query to list all companies.

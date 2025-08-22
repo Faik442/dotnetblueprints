@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace DotnetBlueprints.Auth.Application.Company.Commands.CreateCompany;
+namespace DotnetBlueprints.Auth.Application.Features.Company.Commands.CreateCompany;
 
 public class UpdateCompanyCommandValidator : AbstractValidator<CreateCompanyCommand>
 {

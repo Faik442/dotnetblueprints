@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotnetBlueprints.Auth.Application.Company.Commands.AddRoleToCompany;
+namespace DotnetBlueprints.Auth.Application.Features.Company.Commands.AddRoleToCompany;
 
 /// <summary>
 /// Command to add a role with permissions to a company.

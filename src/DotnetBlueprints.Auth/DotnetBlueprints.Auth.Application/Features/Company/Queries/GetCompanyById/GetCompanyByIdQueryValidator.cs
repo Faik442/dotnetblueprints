@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotnetBlueprints.Auth.Application.Company.Queries.GetCompanyById;
+namespace DotnetBlueprints.Auth.Application.Features.Company.Queries.GetCompanyById;
 
 public class GetCompanyByIdQueryValidator : AbstractValidator<GetCompanyByIdQuery>
 {

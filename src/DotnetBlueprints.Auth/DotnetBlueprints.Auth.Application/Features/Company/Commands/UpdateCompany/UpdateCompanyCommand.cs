@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotnetBlueprints.Auth.Application.Company.Commands.UpdateCompany;
+namespace DotnetBlueprints.Auth.Application.Features.Company.Commands.UpdateCompany;
 
 /// <summary>
 /// Command to rename a company.

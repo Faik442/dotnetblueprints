@@ -1,7 +1,7 @@
 ﻿using DotnetBlueprints.Auth.Application.Common.Interfaces;
 using MediatR;
 
-namespace DotnetBlueprints.Auth.Application.Company.Commands.CreateCompany;
+namespace DotnetBlueprints.Auth.Application.Features.Company.Commands.CreateCompany;
 
 /// <summary>
 /// Command to create a new company.

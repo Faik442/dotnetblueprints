@@ -46,24 +46,28 @@ public sealed class User : BaseEntity, IAggregateRoot
     /// <summary>
     /// Marks the user as deleted (soft delete).
     /// </summary>
-    public void MarkAsDeleted(string deletedBy)
-    {
-        IsDeleted = true;
-        DeletedBy = deletedBy;
-        DeletedDate = DateTime.UtcNow;
-    }
+    public void Delete() => IsDeleted = true;
 
     /// <summary>
     /// Changes the user’s display name.
     /// </summary>
-    public void ChangeDisplayName(string newName, string updatedBy)
+    public void ChangeDisplayName(string newName)
     {
         if (string.IsNullOrWhiteSpace(newName))
             throw new ArgumentException("Display name cannot be empty", nameof(newName));
 
         DisplayName = newName;
-        UpdatedBy = updatedBy;
-        UpdatedDate = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Changes the user’s email.
+    /// </summary>
+    public void ChangeEmail(string newMail)
+    {
+        if (string.IsNullOrWhiteSpace(newMail))
+            throw new ArgumentException("Email name cannot be empty", nameof(newMail));
+
+        Email = newMail;
     }
 
     /// <summary>

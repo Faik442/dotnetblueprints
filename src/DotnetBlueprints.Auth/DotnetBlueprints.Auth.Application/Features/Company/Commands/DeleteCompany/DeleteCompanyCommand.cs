@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotnetBlueprints.Auth.Application.Company.Commands.DeleteCompany;
+namespace DotnetBlueprints.Auth.Application.Features.Company.Commands.DeleteCompany;
 
 
 /// <summary>
