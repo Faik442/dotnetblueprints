@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DotnetBlueprints.Auth.Application\DotnetBlueprints.Auth.Application.csproj" />
     <ProjectReference Include="..\DotnetBlueprints.Auth.Domain\DotnetBlueprints.Auth.Domain.csproj" />
   </ItemGroup>
 

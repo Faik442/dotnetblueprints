@@ -1,5 +1,5 @@
-﻿using DotnetBlueprints.SharedKernel.Abstractions;
-using DotnetBlueprints.SharedKernel.Domain;
+﻿using DotnetBlueprints.SharedKernel.Domain;
+using DotnetBlueprints.SharedKernel.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -12,10 +12,10 @@ namespace DotnetBlueprints.SharedKernel.Infrastructure;
 /// </summary>
 public sealed class AuditInterceptor : SaveChangesInterceptor
 {
-    private readonly IUserContext _user;
+    private readonly ICurrentUser _user;
 
     /// <summary>Initializes a new instance of the <see cref="AuditInterceptor"/> class.</summary>
-    public AuditInterceptor(IUserContext user) => _user = user;
+    public AuditInterceptor(ICurrentUser user) => _user = user;
 
     /// <inheritdoc />
     public override InterceptionResult<int> SavingChanges(
@@ -44,7 +44,7 @@ public sealed class AuditInterceptor : SaveChangesInterceptor
         if (ctx is null) return;
 
         var now = DateTime.UtcNow;
-        var by = _user.UserId ?? _user.UserName ?? "system";
+        var by = _user.UserId.ToString() ?? _user.DisplayName;
 
         foreach (var e in ctx.ChangeTracker.Entries<BaseEntity>())
         {

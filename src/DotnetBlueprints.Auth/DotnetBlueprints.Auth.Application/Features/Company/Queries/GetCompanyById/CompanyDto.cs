@@ -23,7 +23,7 @@ public class CompanyDto
     /// <summary>
     /// Gets the collection of company members.
     /// </summary>
-    public List<UserCompany>? Members { get; set; }
+    public List<Domain.Entities.User>? Members { get; set; }
 
     /// <summary>
     /// Gets the collection of roles defined in the company scope.

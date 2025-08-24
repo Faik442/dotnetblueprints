@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DotnetBlueprints.Auth.Application.Common.Interfaces;
+using DotnetBlueprints.Auth.Application.Interfaces;
 using DotnetBlueprints.SharedKernel.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

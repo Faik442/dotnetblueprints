@@ -1,4 +1,4 @@
-﻿using DotnetBlueprints.Auth.Application.Common.Interfaces;
+﻿using DotnetBlueprints.Auth.Application.Interfaces;
 using DotnetBlueprints.Auth.Domain.Entities;
 using DotnetBlueprints.Auth.Domain.Enums;
 using DotnetBlueprints.SharedKernel.Exceptions;

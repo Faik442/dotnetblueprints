@@ -23,7 +23,7 @@ public sealed class Role : BaseEntity
     /// <param name="name">Human-readable role name (e.g., "Admin", "CompanyViewer").</param>
     /// <param name="companyId">If null, the role is system-wide; otherwise, it is company-scoped.</param>
     /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null or whitespace.</exception>
-    public Role(string name, Guid? companyId = null)
+    public Role(string name, Guid? companyId)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Role name cannot be empty.", nameof(name));
@@ -83,10 +83,5 @@ public sealed class Role : BaseEntity
     /// <summary>
     /// Marks this role as soft deleted.
     /// </summary>
-    public void Delete(string deletedBy)
-    {
-        IsDeleted = true;
-        DeletedDate = DateTime.UtcNow;
-        DeletedBy = deletedBy;
-    }
+    public void Delete() => IsDeleted = true;
 }

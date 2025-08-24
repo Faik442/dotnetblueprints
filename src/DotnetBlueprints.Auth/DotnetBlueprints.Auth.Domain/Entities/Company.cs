@@ -12,7 +12,7 @@ namespace DotnetBlueprints.Auth.Domain.Entities;
 /// </summary>
 public sealed class Company : BaseEntity, IAggregateRoot
 {
-    private readonly List<UserCompany> _members = new();
+    private readonly List<User> _members = new();
     private readonly List<Role> _roles = new();
 
     private Company() { }
@@ -33,7 +33,7 @@ public sealed class Company : BaseEntity, IAggregateRoot
     /// <summary>
     /// Gets the collection of company members.
     /// </summary>
-    public IReadOnlyCollection<UserCompany> Members => _members;
+    public IReadOnlyCollection<User> Members => _members;
 
     /// <summary>
     /// Gets the collection of roles defined in the company scope.
@@ -62,32 +62,7 @@ public sealed class Company : BaseEntity, IAggregateRoot
     /// <summary>
     /// Marks the company as soft deleted.
     /// </summary>
-    public void Delete(string deletedBy)
-    {
-        if (string.IsNullOrWhiteSpace(deletedBy))
-            throw new ArgumentException("DeletedBy cannot be empty.", nameof(deletedBy));
-        
-        IsDeleted = true;
-        DeletedBy = deletedBy;
-    }
-
-    /// <summary>
-    /// Adds a new member to the company with the given roles.
-    /// </summary>
-    public UserCompany AddMember(User user, IEnumerable<Role> roles, bool isPrimary = false)
-    {
-        if (_members.Any(m => m.UserId == user.Id))
-            throw new InvalidOperationException($"User {user.Email} is already a member of {Name}");
-
-        var membership = new UserCompany(user.Id, Id, isPrimary);
-        foreach (var role in roles)
-        {
-            membership.AddRole(role);
-        }
-
-        _members.Add(membership);
-        return membership;
-    }
+    public void Delete() => IsDeleted = true;
 
     /// <summary>
     /// Adds a new role to the company with the specified permissions.
@@ -100,7 +75,7 @@ public sealed class Company : BaseEntity, IAggregateRoot
         var role = new Role(roleName, Id);
         foreach (var perm in permissions)
         {
-            role.AddPermission(new Permission(perm.Value));
+            role.AddPermission(perm);
         }
 
         _roles.Add(role);

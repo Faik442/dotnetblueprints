@@ -1,5 +1,6 @@
 ﻿using DotnetBlueprints.SharedKernel.Abstractions;
 using DotnetBlueprints.SharedKernel.Domain;
+using System.Data;
 
 namespace DotnetBlueprints.Auth.Domain.Entities;
 
@@ -9,39 +10,48 @@ namespace DotnetBlueprints.Auth.Domain.Entities;
 /// </summary>
 public sealed class User : BaseEntity, IAggregateRoot
 {
-    private readonly List<UserCompany> _companies = new();
-    private readonly List<UserPermissionOverride> _permissionOverrides = new();
+    private readonly List<UserCompanyRole> _userCompanyRoles = new();
 
-    private User() { }
-
-    public User(string email, string? displayName = null)
+    private User(string email, string displayName, string passwordHash, IEnumerable<Role> roles)
     {
         if (string.IsNullOrWhiteSpace(email))
-            throw new ArgumentException("Email cannot be empty", nameof(email));
+            throw new ArgumentException("Email cannot be empty.", nameof(email));
+        if (string.IsNullOrWhiteSpace(passwordHash))
+            throw new ArgumentException("Password hash cannot be empty.", nameof(passwordHash));
+
+        foreach (var role in roles)
+        {
+            AddRole(role);
+        }
 
         Email = email;
         DisplayName = displayName;
-        IsActive = true;
+        PasswordHash = passwordHash;
         IsDeleted = false;
     }
 
+    /// <summary>Factory method to create a new user with a precomputed password hash.</summary>
+    public static User Create(string email, string displayName, string passwordHash, IEnumerable<Role> roles)
+        => new User(email, displayName, passwordHash, roles);
+
     public string Email { get; private set; } = default!;
-    public string? DisplayName { get; private set; }
-    public string? PasswordHash { get; private set; }
-    public bool IsActive { get; private set; }
-
-    public IReadOnlyCollection<UserCompany> Companies => _companies;
-    public IReadOnlyCollection<UserPermissionOverride> PermissionOverrides => _permissionOverrides;
+    public string DisplayName { get; private set; }
+    public string PasswordHash { get; private set; }
 
     /// <summary>
-    /// Deactivates the user without deleting it.
+    /// Gets the company identifier (part of the composite key).
     /// </summary>
-    public void Deactivate() => IsActive = false;
+    public Guid CompanyId { get; private set; }
 
     /// <summary>
-    /// Reactivates the user.
+    /// Gets the company navigation.
     /// </summary>
-    public void Activate() => IsActive = true;
+    public Company Company { get; private set; } = default!;
+
+    /// <summary>
+    /// Gets the roles assigned to the user within the company scope.
+    /// </summary>
+    public IReadOnlyCollection<UserCompanyRole> UserCompanyRoles => _userCompanyRoles;
 
     /// <summary>
     /// Marks the user as deleted (soft delete).
@@ -82,18 +92,29 @@ public sealed class User : BaseEntity, IAggregateRoot
     }
 
     /// <summary>
-    /// Sets primary company of the user.
+    /// Assigns a role if not already present.
     /// </summary>
-    public void SetPrimaryCompany(Guid companyId)
+    public void AddRole(Role role)
     {
-        if (!_companies.Any(c => c.CompanyId == companyId))
-            throw new InvalidOperationException("User is not a member of this company.");
+        if (role is null) throw new ArgumentNullException(nameof(role));
 
-        foreach (var membership in _companies)
-        {
-            membership.UnsetPrimary();
-        }
+        var sameCompanyOrSystem = role.CompanyId is null || role.CompanyId == CompanyId;
+        if (!sameCompanyOrSystem)
+            throw new InvalidOperationException(
+                $"Role '{role.Name}' does not belong to company {CompanyId}.");
 
-        _companies.First(c => c.CompanyId == companyId).SetPrimary();
+        if (_userCompanyRoles.Any(r => r.RoleId == role.Id)) return;
+
+        _userCompanyRoles.Add(new UserCompanyRole(Id, CompanyId, role.Id));
+    }
+
+    /// <summary>
+    /// Removes a role if present.
+    /// </summary>
+    public void DeleteRole(Guid roleId)
+    {
+        var link = _userCompanyRoles.FirstOrDefault(r => r.RoleId == roleId);
+        if (link is null) return;
+        IsDeleted = true;
     }
 }

@@ -1,4 +1,4 @@
-﻿using DotnetBlueprints.Auth.Application.Common.Interfaces;
+﻿using DotnetBlueprints.Auth.Application.Interfaces;
 using MediatR;
 
 namespace DotnetBlueprints.Auth.Application.Features.Company.Commands.CreateCompany;

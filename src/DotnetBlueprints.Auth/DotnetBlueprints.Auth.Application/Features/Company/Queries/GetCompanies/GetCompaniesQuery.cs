@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using DotnetBlueprints.Auth.Application.Common.Interfaces;
 using DotnetBlueprints.Auth.Application.Features.Company.Queries.GetCompanyById;
+using DotnetBlueprints.Auth.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;

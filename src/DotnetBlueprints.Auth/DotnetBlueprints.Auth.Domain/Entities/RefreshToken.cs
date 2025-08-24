@@ -15,13 +15,20 @@ public sealed class RefreshToken : BaseEntity
     /// <param name="userId">User identifier.</param>
     /// <param name="tokenHash">Hashed refresh token string (never store raw).</param>
     /// <param name="expiresAt">Expiration time in UTC.</param>
-    /// <param name="jwtId">Associated JWT identifier.</param>
-    public RefreshToken(Guid userId, string tokenHash, DateTime expiresAt, string jwtId)
+    /// <param name="issuedForJti">The JTI of the access token this refresh token was issued for.</param>
+    public RefreshToken(Guid userId, string hash, DateTime expiresAtUtc, string issuedForJti)
     {
         UserId = userId;
-        TokenHash = tokenHash ?? throw new ArgumentNullException(nameof(tokenHash));
-        ExpiresAt = expiresAt;
-        JwtId = jwtId ?? throw new ArgumentNullException(nameof(jwtId));
+        Hash = !string.IsNullOrWhiteSpace(hash)
+            ? hash
+            : throw new ArgumentNullException(nameof(hash));
+
+        ExpiresAt = expiresAtUtc;
+
+        IssuedForJti = !string.IsNullOrWhiteSpace(issuedForJti)
+            ? issuedForJti
+            : throw new ArgumentNullException(nameof(issuedForJti));
+
         CreatedAt = DateTime.UtcNow;
     }
 
@@ -31,14 +38,20 @@ public sealed class RefreshToken : BaseEntity
     public Guid UserId { get; private set; }
 
     /// <summary>
-    /// Gets the hashed token value.
+    /// SHA256 hash of the raw refresh token string (never store raw values).
     /// </summary>
-    public string TokenHash { get; private set; }
+    public string Hash { get; private set; }
 
     /// <summary>
     /// Gets the expiration date (UTC).
     /// </summary>
     public DateTime ExpiresAt { get; private set; }
+
+    /// <summary>
+    /// The JTI (unique identifier) of the access token that this refresh token was originally issued for.
+    /// Used to correlate refresh tokens with access tokens.
+    /// </summary>
+    public string IssuedForJti { get; private set; } = default!;
 
     /// <summary>
     /// Gets the creation time (UTC).
@@ -51,19 +64,18 @@ public sealed class RefreshToken : BaseEntity
     public DateTime? RevokedAt { get; private set; }
 
     /// <summary>
-    /// Gets the associated JWT identifier.
+    /// JTI of the replacement refresh token, if this token was rotated.
+    /// Used for traceability and replay detection.
     /// </summary>
-    public string JwtId { get; private set; }
+    public string? ReplacedByJti { get; private set; }
 
     /// <summary>
     /// Marks the refresh token as revoked.
     /// </summary>
-    public void Revoke()
+    public void Revoke(string replacedByJti)
     {
-        if (RevokedAt is null)
-        {
-            RevokedAt = DateTime.UtcNow;
-        }
+        RevokedAt = DateTime.UtcNow;
+        ReplacedByJti = replacedByJti;
     }
 
     /// <summary>

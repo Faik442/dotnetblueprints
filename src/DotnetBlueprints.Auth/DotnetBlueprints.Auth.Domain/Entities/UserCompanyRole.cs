@@ -43,7 +43,7 @@ public sealed class UserCompanyRole
     /// <summary>
     /// Navigation to the user-company membership.
     /// </summary>
-    public UserCompany UserCompany { get; private set; } = default!;
+    public User User { get; private set; } = default!;
 
     /// <summary>
     /// Navigation to the role.

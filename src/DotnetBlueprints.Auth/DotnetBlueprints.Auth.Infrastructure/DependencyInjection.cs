@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using DotnetBlueprints.Auth.Infrastructure.Persistence;
-using DotnetBlueprints.SharedKernel.Abstractions;
 using DotnetBlueprints.SharedKernel.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using DotnetBlueprints.Auth.Infrastructure.Identity;
+using DotnetBlueprints.SharedKernel.Security;
 
 namespace DotnetBlueprints.Auth.Infrastructure;
 
@@ -13,7 +14,7 @@ public static class DependencyInjection
     {
         services.AddHttpContextAccessor();
 
-        services.AddScoped<IUserContext, CurrentUserContext>();
+        services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddScoped<AuditInterceptor>();
 
         services.AddDbContext<AuthDbContext>((sp, opt) =>

@@ -1,4 +1,4 @@
-﻿using DotnetBlueprints.Auth.Application.Common.Interfaces;
+﻿using DotnetBlueprints.Auth.Application.Interfaces;
 using DotnetBlueprints.SharedKernel.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +34,7 @@ public sealed class DeleteCompanyCommandHandler : IRequestHandler<DeleteCompanyC
             .FirstOrDefaultAsync(c => c.Id == request.CompanyId, cancellationToken)
             ?? throw new NotFoundException(nameof(Company), request.CompanyId);
 
-        company.Delete(request.DeletedBy);
+        company.Delete();
 
         await _context.SaveChangesAsync(cancellationToken);
     }

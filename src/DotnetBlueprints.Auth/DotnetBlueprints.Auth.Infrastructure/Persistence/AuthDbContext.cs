@@ -20,9 +20,7 @@ public sealed class AuthDbContext : DbContext
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<Permission> Permissions => Set<Permission>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
-    public DbSet<UserCompany> UserCompanies => Set<UserCompany>();
     public DbSet<UserCompanyRole> UserCompanyRoles => Set<UserCompanyRole>();
-    public DbSet<UserPermissionOverride> UserPermissionOverrides => Set<UserPermissionOverride>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<AccessToken> AccessTokens => Set<AccessToken>();
 
@@ -41,12 +39,12 @@ public sealed class AuthDbContext : DbContext
             .HasKey(ucr => new { ucr.UserId, ucr.CompanyId, ucr.RoleId });
 
         // === Relationships ===
-        modelBuilder.Entity<UserCompany>()
-            .HasKey(uc => new { uc.UserId, uc.CompanyId });
+        modelBuilder.Entity<User>()
+            .HasKey(uc => new { uc.Id, uc.CompanyId });
 
-        modelBuilder.Entity<UserCompany>()
+        modelBuilder.Entity<User>()
             .HasMany(uc => uc.UserCompanyRoles)
-            .WithOne(ucr => ucr.UserCompany)
+            .WithOne(ucr => ucr.User)
             .HasForeignKey(ucr => new { ucr.UserId, ucr.CompanyId });
 
         modelBuilder.Entity<RolePermission>()
@@ -61,7 +59,7 @@ public sealed class AuthDbContext : DbContext
 
         // === Token Config ===
         modelBuilder.Entity<RefreshToken>()
-            .HasIndex(rt => rt.TokenHash)
+            .HasIndex(rt => rt.Hash)
             .IsUnique();
 
         modelBuilder.Entity<AccessToken>()
@@ -90,10 +88,9 @@ public sealed class AuthDbContext : DbContext
         modelBuilder.Entity<Role>().HasQueryFilter(x => !x.IsDeleted);
         modelBuilder.Entity<Permission>().HasQueryFilter(x => !x.IsDeleted);
         modelBuilder.Entity<Company>().HasQueryFilter(x => !x.IsDeleted);
-        modelBuilder.Entity<UserCompany>().HasQueryFilter(x => !x.IsDeleted);
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
         modelBuilder.Entity<Role>().HasIndex(r => new { r.Name, r.CompanyId }).IsUnique();
         modelBuilder.Entity<Permission>().HasIndex(p => p.Key).IsUnique();
-        modelBuilder.Entity<RefreshToken>().HasIndex(rt => rt.TokenHash).IsUnique();
+        modelBuilder.Entity<RefreshToken>().HasIndex(rt => rt.Hash).IsUnique();
     }
 }
