@@ -1,7 +1,6 @@
-﻿using DotnetBlueprints.SharedKernel.Security;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 
-namespace DotnetBlueprints.Sales.Api;
+namespace DotnetBlueprints.Auth.Api;
 
 public static class DependencyInjection
 {
@@ -17,11 +16,7 @@ public static class DependencyInjection
                 Description = "Enterprise-grade sales API with modular structure and best practices."
             });
         });
-
-        services.AddControllers(o =>
-        {
-            o.Filters.Add<PermissionAuthorizeFilter>();
-        });
+        services.AddControllers();
 
         return services;
     }

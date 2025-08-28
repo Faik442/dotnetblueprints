@@ -1,12 +1,4 @@
-﻿using AutoMapper.Execution;
-using DotnetBlueprints.Auth.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DotnetBlueprints.Auth.Application.Features.Company.Queries.GetCompanyById;
+﻿namespace DotnetBlueprints.Auth.Application.Features.Company.Queries.GetCompanyById;
 
 public class CompanyDto
 {
@@ -28,5 +20,5 @@ public class CompanyDto
     /// <summary>
     /// Gets the collection of roles defined in the company scope.
     /// </summary>
-    public List<Role>? Roles { get; set; }
+    public List<Domain.Entities.Role>? Roles { get; set; }
 }

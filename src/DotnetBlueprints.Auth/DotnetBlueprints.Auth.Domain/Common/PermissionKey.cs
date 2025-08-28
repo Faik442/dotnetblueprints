@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace DotnetBlueprints.Auth.Domain.Enums;
 
-public record PermissionKey(string Value)
+public static class PermissionNames
 {
-    public static readonly PermissionKey OffersReadSelf = new("Offers.Read.Self");
-    public static readonly PermissionKey OffersReadCompany = new("Offers.Read.Company");
-    public static readonly PermissionKey OffersReadAll = new("Offers.Read.All");
+    public const string OffersReadSelf = "Offers.Read.Self";
+    public const string OffersReadCompany = "Offers.Read.Company";
+    //public static readonly PermissionKey OffersReadAll = new("Offers.Read.All");
 
-    public static readonly PermissionKey OffersWriteSelf = new("Offers.Write.Self");
-    public static readonly PermissionKey OffersWriteCompany = new("Offers.Write.Company");
-    public static readonly PermissionKey OffersWriteAll = new("Offers.Write.All");
+    //public static readonly PermissionKey OffersWriteSelf = new("Offers.Write.Self");
+    //public static readonly PermissionKey OffersWriteCompany = new("Offers.Write.Company");
+    //public static readonly PermissionKey OffersWriteAll = new("Offers.Write.All");
 }
 

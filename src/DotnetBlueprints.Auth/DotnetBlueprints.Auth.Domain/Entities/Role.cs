@@ -56,7 +56,7 @@ public sealed class Role : BaseEntity
     /// Renames the role.
     /// </summary>
     /// <param name="newName">New role name.</param>
-    public void Rename(string newName, string updatedBy)
+    public void Rename(string newName)
     {
         if (string.IsNullOrWhiteSpace(newName))
             throw new ArgumentException("Role name cannot be empty.", nameof(newName));
@@ -65,19 +65,30 @@ public sealed class Role : BaseEntity
             return;
 
         Name = newName;
-        UpdatedBy = updatedBy;
     }
 
     /// <summary>
     /// Grants the specified permission to the role if not already present.
     /// </summary>
     /// <param name="permission">Permission entity to be granted.</param>
-    public void AddPermission(PermissionKey key)
+    public void AddPermission(Guid permissionId)
     {
-        if (_rolePermissions.Any(rp => rp.Permission.Key == key.Value))
+        if (_rolePermissions.Any(rp => rp.PermissionId == permissionId))
             return;
 
-        _rolePermissions.Add(new RolePermission(Id, new Permission(key.Value).Id));
+        _rolePermissions.Add(new RolePermission(Id, permissionId));
+    }
+
+    /// <summary>
+    /// Removes the specified permission to the role if already present.
+    /// </summary>
+    /// <param name="permission">Permission entity to be granted.</param>
+    public void RemovePermission(Guid permissionId)
+    {
+        if (_rolePermissions.Any(rp => rp.PermissionId == permissionId))
+            return;
+
+        _rolePermissions.Remove(new RolePermission(Id, permissionId));
     }
 
     /// <summary>

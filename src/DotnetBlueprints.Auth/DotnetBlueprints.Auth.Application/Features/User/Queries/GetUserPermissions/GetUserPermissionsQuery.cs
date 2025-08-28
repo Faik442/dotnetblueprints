@@ -61,7 +61,6 @@ public sealed class GetUserPermissionsQueryHandler
         if (roleIds.Count == 0)
             return Array.Empty<string>();
 
-        // RolePermission → Permission.Key (distinct)
         var permKeys = await
             (from rp in _db.RolePermissions.AsNoTracking()
              join p in _db.Permissions.AsNoTracking() on rp.PermissionId equals p.Id

@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotnetBlueprints.Auth.Application.Features.Company.Commands.AddRoleToCompany;
+namespace DotnetBlueprints.Auth.Application.Features.Company.Commands.CreateCompanyRole;
 
-public class AddRoleToCompanyCommandValidator : AbstractValidator<AddRoleToCompanyCommand>
+public class CreateRoleToCompanyCommandValidator : AbstractValidator<CreateCompanyRoleCommand>
 {
-    public AddRoleToCompanyCommandValidator()
+    public CreateRoleToCompanyCommandValidator()
     {
         RuleFor(x => x.RoleName)
             .NotEmpty().WithMessage("Role name is required.")

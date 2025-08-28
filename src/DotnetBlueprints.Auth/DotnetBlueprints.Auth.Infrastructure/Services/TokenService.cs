@@ -81,15 +81,12 @@ public sealed class TokenService : ITokenService
                 .FirstOrDefaultAsync(u => u.Id == rt.UserId && !u.IsDeleted, ct)
                 ?? throw new UnauthorizedAccessException("User not found.");
 
-        // 1) Revoke old RT (rotation)
         var newJti = Guid.NewGuid().ToString("N");
         rt.Revoke(newJti);
         await _db.SaveChangesAsync(ct);
 
-        // 2) New access (no RT yet)
         var (access, exp, _) = await GenerateAccessToken(user, ct, jtiOverride: newJti);
 
-        // 3) New RT
         var newRaw = CreateRawRefreshToken();
         var newHash = Hash(newRaw);
         _db.RefreshTokens.Add(new RefreshToken(user.Id, newHash, DateTime.UtcNow.AddDays(_opt.Value.RefreshTokenDays), newJti));
@@ -146,24 +143,6 @@ public sealed class TokenService : ITokenService
 
         var access = SignJwt(claims, exp);
         return (access, exp, jti);
-    }
-
-
-    /// <summary>
-    /// Returns role IDs the user has for the given company, including system-wide roles.
-    /// Only non-deleted roles are considered.
-    /// </summary>
-    private async Task<List<Guid>> GetCompanyScopedRoleIdsAsync(Guid userId, Guid companyId, CancellationToken ct)
-    {
-        // Varsayım: UserRoles(UserId, RoleId) ve Roles(Id, CompanyId, IsDeleted) tabloların var.
-        // Role.CompanyId == companyId  || Role.CompanyId == null  (system-wide)
-        return await _db.UserCompanyRoles
-            .Where(ur => ur.UserId == userId)
-            .Select(ur => ur.Role)
-            .Where(r => !r.IsDeleted && (r.CompanyId == companyId || r.CompanyId == null))
-            .Select(r => r.Id)
-            .Distinct()
-            .ToListAsync(ct);
     }
 
     private string SignJwt(IEnumerable<Claim> claims, DateTime expUtc)

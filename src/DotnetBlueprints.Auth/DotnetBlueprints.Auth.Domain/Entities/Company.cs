@@ -67,13 +67,13 @@ public sealed class Company : BaseEntity, IAggregateRoot
     /// <summary>
     /// Adds a new role to the company with the specified permissions.
     /// </summary>
-    public Role AddRole(string roleName, IEnumerable<PermissionKey> permissions)
+    public Role AddRole(string roleName, IEnumerable<Guid> permissionIds)
     {
         if (_roles.Any(r => r.Name.Equals(roleName, StringComparison.OrdinalIgnoreCase)))
             throw new InvalidOperationException($"Role {roleName} already exists in company {Name}");
 
         var role = new Role(roleName, Id);
-        foreach (var perm in permissions)
+        foreach (var perm in permissionIds)
         {
             role.AddPermission(perm);
         }
