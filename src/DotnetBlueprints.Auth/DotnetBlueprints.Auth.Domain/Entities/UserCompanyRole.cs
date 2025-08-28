@@ -1,4 +1,6 @@
-﻿namespace DotnetBlueprints.Auth.Domain.Entities;
+﻿using DotnetBlueprints.SharedKernel.Domain;
+
+namespace DotnetBlueprints.Auth.Domain.Entities;
 
 /// <summary>
 /// Join entity linking a user-company membership to a role within the same company scope.

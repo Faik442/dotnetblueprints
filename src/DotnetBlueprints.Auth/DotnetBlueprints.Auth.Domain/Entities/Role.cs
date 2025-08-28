@@ -1,5 +1,7 @@
 ﻿using DotnetBlueprints.Auth.Domain.Enums;
 using DotnetBlueprints.SharedKernel.Domain;
+using DotnetBlueprints.SharedKernel.Exceptions;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace DotnetBlueprints.Auth.Domain.Entities;
 
@@ -77,18 +79,6 @@ public sealed class Role : BaseEntity
             return;
 
         _rolePermissions.Add(new RolePermission(Id, permissionId));
-    }
-
-    /// <summary>
-    /// Removes the specified permission to the role if already present.
-    /// </summary>
-    /// <param name="permission">Permission entity to be granted.</param>
-    public void RemovePermission(Guid permissionId)
-    {
-        if (_rolePermissions.Any(rp => rp.PermissionId == permissionId))
-            return;
-
-        _rolePermissions.Remove(new RolePermission(Id, permissionId));
     }
 
     /// <summary>

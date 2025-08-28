@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace DotnetBlueprints.Auth.Application.Features.Auth.Commands.RefreshToken;
 
-public sealed record RefreshCommand(string RefreshToken) : IRequest<TokenPair>;
+public sealed record RefreshTokenCommand(string RefreshToken) : IRequest<TokenPair>;
 
-public sealed class RefreshCommandHandler : IRequestHandler<RefreshCommand, TokenPair>
+public sealed class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, TokenPair>
 {
     private readonly ITokenService _tokens;
 
-    public RefreshCommandHandler(ITokenService tokens) => _tokens = tokens;
+    public RefreshTokenCommandHandler(ITokenService tokens) => _tokens = tokens;
 
-    public Task<TokenPair> Handle(RefreshCommand req, CancellationToken ct)
+    public Task<TokenPair> Handle(RefreshTokenCommand req, CancellationToken ct)
         => _tokens.RefreshAsync(req.RefreshToken, ct);
 }

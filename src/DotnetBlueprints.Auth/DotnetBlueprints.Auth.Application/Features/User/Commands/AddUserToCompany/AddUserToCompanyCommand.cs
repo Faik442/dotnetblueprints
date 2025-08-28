@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 namespace DotnetBlueprints.Auth.Application.Features.User.Commands.AddUserToCompany;
 
 /// <summary>Creates (or re-activates) a user-company membership and optionally assigns roles.</summary>
-public sealed record AddUserToCompanyCommand(Guid CompanyId, string Email, string DisplayName, string Password, IEnumerable<Guid> RoleIds) : IRequest;
+public sealed record AddUserToCompanyCommand(Guid CompanyId, string Email, string DisplayName, string Password, IEnumerable<Guid> RoleIds) : IRequest<Guid>;
 
-public sealed class AddUserToCompanyCommandHandler : IRequestHandler<AddUserToCompanyCommand>
+public sealed class AddUserToCompanyCommandHandler : IRequestHandler<AddUserToCompanyCommand, Guid>
 {
     private readonly IAuthDbContext _db;
 
@@ -24,7 +24,7 @@ public sealed class AddUserToCompanyCommandHandler : IRequestHandler<AddUserToCo
         _db = db;
         _hasher = hasher;
     }
-    public async Task Handle(AddUserToCompanyCommand req, CancellationToken ct)
+    public async Task<Guid> Handle(AddUserToCompanyCommand req, CancellationToken ct)
     {
         var company = await _db.Companies.FindAsync([req.CompanyId], ct)
                       ?? throw new KeyNotFoundException("Company not found.");
@@ -34,6 +34,8 @@ public sealed class AddUserToCompanyCommandHandler : IRequestHandler<AddUserToCo
         var membership = Domain.Entities.User.Create(req.Email, req.DisplayName, _hasher.Hash(req.Password), roles);
 
         await _db.SaveChangesAsync(ct);
+
+        return membership.Id;
     }
 }
 
