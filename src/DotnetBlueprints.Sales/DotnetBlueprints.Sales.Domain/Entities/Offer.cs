@@ -11,6 +11,16 @@ namespace DotnetBlueprints.Sales.Domain.Entities;
 /// </summary>
 public class Offer : BaseEntity
 {
+    /// <summary>
+    /// Gets the company of the offer.
+    /// </summary>
+    public Guid CompanyId { get; private set; }
+
+    /// <summary>
+    /// Gets the user of the offer.
+    /// </summary>
+    public Guid UserId { get; private set; }
+
     [Auditable]
     /// <summary>
     /// Gets the title or name of the offer.
@@ -44,8 +54,10 @@ public class Offer : BaseEntity
     /// </summary>
     /// <param name="title">The title of the offer.</param>
     /// <param name="validUntil">The expiration date of the offer.</param>
-    public Offer(string title, DateTime validUntil, string? createdBy)
+    public Offer(Guid userId, Guid companyId, string title, DateTime validUntil, string? createdBy)
     {
+        UserId = userId;
+        CompanyId = companyId;
         Title = title;
         ValidUntil = validUntil;
         if (createdBy != null)

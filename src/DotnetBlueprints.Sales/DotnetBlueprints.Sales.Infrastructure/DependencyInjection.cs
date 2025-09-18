@@ -1,10 +1,13 @@
-﻿using DotnetBlueprints.Elastic.Clients;
+﻿using DotnetBlueprints.Auth.Infrastructure.Identity;
+using DotnetBlueprints.Elastic.Clients;
 using DotnetBlueprints.Elastic.Configuration;
 using DotnetBlueprints.Elastic.Services;
 using DotnetBlueprints.Sales.Application.Common.Interfaces;
 using DotnetBlueprints.Sales.Infrastructure.Audit;
 using DotnetBlueprints.Sales.Infrastructure.Persistence;
 using DotnetBlueprints.SharedKernel.Audit;
+using DotnetBlueprints.SharedKernel.Infrastructure;
+using DotnetBlueprints.SharedKernel.Security;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -17,8 +20,18 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<SalesDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DotnetBlueprints_Sales")));
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<AuditInterceptor>();
+
+        services.AddDbContext<SalesDbContext>((sp, options) =>
+        {
+            options.UseSqlServer(
+                configuration.GetConnectionString("DotnetBlueprints_Sales"),
+                sql => sql.MigrationsAssembly(typeof(SalesDbContext).Assembly.GetName().Name));
+
+            options.AddInterceptors(sp.GetRequiredService<AuditInterceptor>());
+        });
 
         services.AddScoped<ISalesDbContext>(provider => provider.GetRequiredService<SalesDbContext>());
         services.AddScoped<IAuditHistoryRepository, AuditHistoryRepository>();

@@ -1,5 +1,6 @@
 ﻿using DotnetBlueprints.SharedKernel.Abstractions;
 using DotnetBlueprints.SharedKernel.Domain;
+using StackExchange.Redis;
 using System.Data;
 
 namespace DotnetBlueprints.Auth.Domain.Entities;
@@ -10,19 +11,17 @@ namespace DotnetBlueprints.Auth.Domain.Entities;
 /// </summary>
 public sealed class User : BaseEntity, IAggregateRoot
 {
-    private readonly List<UserCompanyRole> _userCompanyRoles = new();
+    private readonly List<UserRole> _userRoles = new();
 
-    private User(string email, string displayName, string passwordHash, IEnumerable<Role> roles)
+    private User() { }
+    public User(string email, string displayName, string passwordHash, IEnumerable<Role> roles)
     {
         if (string.IsNullOrWhiteSpace(email))
             throw new ArgumentException("Email cannot be empty.", nameof(email));
         if (string.IsNullOrWhiteSpace(passwordHash))
             throw new ArgumentException("Password hash cannot be empty.", nameof(passwordHash));
 
-        foreach (var role in roles)
-        {
-            AddRole(role);
-        }
+        AddRoles(roles);
 
         Email = email;
         DisplayName = displayName;
@@ -51,7 +50,7 @@ public sealed class User : BaseEntity, IAggregateRoot
     /// <summary>
     /// Gets the roles assigned to the user within the company scope.
     /// </summary>
-    public IReadOnlyCollection<UserCompanyRole> UserCompanyRoles => _userCompanyRoles;
+    public IReadOnlyCollection<UserRole> UserRoles => _userRoles;
 
     /// <summary>
     /// Marks the user as deleted (soft delete).
@@ -92,29 +91,28 @@ public sealed class User : BaseEntity, IAggregateRoot
     }
 
     /// <summary>
-    /// Assigns a role if not already present.
+    /// Assigns roles if not already present.
     /// </summary>
-    public void AddRole(Role role)
+    public void AddRoles(IEnumerable<Role> roles)
     {
-        if (role is null) throw new ArgumentNullException(nameof(role));
+        ArgumentNullException.ThrowIfNull(roles);
 
-        var sameCompanyOrSystem = role.CompanyId is null || role.CompanyId == CompanyId;
-        if (!sameCompanyOrSystem)
-            throw new InvalidOperationException(
-                $"Role '{role.Name}' does not belong to company {CompanyId}.");
-
-        if (_userCompanyRoles.Any(r => r.RoleId == role.Id)) return;
-
-        _userCompanyRoles.Add(new UserCompanyRole(Id, CompanyId, role.Id));
+        foreach(var role in roles)
+        {
+            _userRoles.Add(new UserRole(Id, role.Id));
+        }
     }
 
     /// <summary>
-    /// Removes a role if present.
+    /// Removes roles if present.
     /// </summary>
-    public void DeleteRole(Guid roleId)
+    public void DeleteRoles(List<Guid> roleIds)
     {
-        var link = _userCompanyRoles.FirstOrDefault(r => r.RoleId == roleId);
+        var link = _userRoles.Where(r => roleIds.Contains(r.RoleId));
         if (link is null) return;
-        IsDeleted = true;
+        foreach (var item in link)
+        {
+            IsDeleted = true;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DotnetBlueprints.Auth.Domain.Entities;
+using DotnetBlueprints.SharedKernel.Audit;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotnetBlueprints.Auth.Application.Interfaces;
@@ -12,7 +13,8 @@ public interface IAuthDbContext
     DbSet<Role> Roles { get; }
     DbSet<RolePermission> RolePermissions { get; }
     DbSet<User> Users { get; }
-    DbSet<UserCompanyRole> UserCompanyRoles { get; }
+    DbSet<UserRole> UserRoles { get; }
+    DbSet<AuditHistory> AuditHistories { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

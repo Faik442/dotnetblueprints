@@ -29,7 +29,7 @@ public sealed class AddUserToCompanyCommandHandler : IRequestHandler<AddUserToCo
         var company = await _db.Companies.FindAsync([req.CompanyId], ct)
                       ?? throw new KeyNotFoundException("Company not found.");
 
-        var roles = _db.Roles.Where(x => x.CompanyId == req.CompanyId && req.RoleIds.Contains(x.Id));
+        var roles = _db.Roles.Where(x => req.RoleIds.Contains(x.Id));
 
         var membership = Domain.Entities.User.Create(req.Email, req.DisplayName, _hasher.Hash(req.Password), roles);
 

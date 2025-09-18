@@ -72,11 +72,8 @@ public sealed class Company : BaseEntity, IAggregateRoot
         if (_roles.Any(r => r.Name.Equals(roleName, StringComparison.OrdinalIgnoreCase)))
             throw new InvalidOperationException($"Role {roleName} already exists in company {Name}");
 
-        var role = new Role(roleName, Id);
-        foreach (var perm in permissionIds)
-        {
-            role.AddPermission(perm);
-        }
+        var role = new Role(roleName);
+        role.AddPermissions(permissionIds);
 
         _roles.Add(role);
         return role;

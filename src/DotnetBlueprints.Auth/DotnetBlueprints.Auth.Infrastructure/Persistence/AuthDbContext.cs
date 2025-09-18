@@ -1,4 +1,6 @@
-﻿using DotnetBlueprints.Auth.Domain.Entities;
+﻿using DotnetBlueprints.Auth.Application.Interfaces;
+using DotnetBlueprints.Auth.Domain.Entities;
+using DotnetBlueprints.SharedKernel.Audit;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Reflection.Emit;
@@ -8,7 +10,7 @@ namespace DotnetBlueprints.Auth.Infrastructure.Persistence;
 /// <summary>
 /// EF Core database context for authentication and authorization.
 /// </summary>
-public sealed class AuthDbContext : DbContext
+public sealed class AuthDbContext : DbContext, IAuthDbContext
 {
     public AuthDbContext(DbContextOptions<AuthDbContext> options)
         : base(options)
@@ -16,13 +18,15 @@ public sealed class AuthDbContext : DbContext
     }
 
     // === DbSets ===
-    public DbSet<User> Users => Set<User>();
-    public DbSet<Role> Roles => Set<Role>();
-    public DbSet<Permission> Permissions => Set<Permission>();
-    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
-    public DbSet<UserCompanyRole> UserCompanyRoles => Set<UserCompanyRole>();
-    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
-    public DbSet<AccessToken> AccessTokens => Set<AccessToken>();
+    public DbSet<User> Users { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
+    public DbSet<RolePermission> RolePermissions { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<AccessToken> AccessTokens { get; set; }
+    public DbSet<Company> Companies { get; set; }
+    public DbSet<AuditHistory> AuditHistories { get; set; }
 
     /// <summary>
     /// Configures model mappings and global query filters (soft-delete).
@@ -35,17 +39,17 @@ public sealed class AuthDbContext : DbContext
         modelBuilder.Entity<RolePermission>()
             .HasKey(rp => new { rp.RoleId, rp.PermissionId });
 
-        modelBuilder.Entity<UserCompanyRole>()
-            .HasKey(ucr => new { ucr.UserId, ucr.CompanyId, ucr.RoleId });
+        modelBuilder.Entity<UserRole>()
+            .HasKey(ucr => new { ucr.UserId, ucr.RoleId });
 
         // === Relationships ===
         modelBuilder.Entity<User>()
             .HasKey(uc => new { uc.Id, uc.CompanyId });
 
         modelBuilder.Entity<User>()
-            .HasMany(uc => uc.UserCompanyRoles)
+            .HasMany(uc => uc.UserRoles)
             .WithOne(ucr => ucr.User)
-            .HasForeignKey(ucr => new { ucr.UserId, ucr.CompanyId });
+            .HasForeignKey(ucr => new { ucr.UserId });
 
         modelBuilder.Entity<RolePermission>()
             .HasOne(rp => rp.Role)
@@ -89,7 +93,7 @@ public sealed class AuthDbContext : DbContext
         modelBuilder.Entity<Permission>().HasQueryFilter(x => !x.IsDeleted);
         modelBuilder.Entity<Company>().HasQueryFilter(x => !x.IsDeleted);
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
-        modelBuilder.Entity<Role>().HasIndex(r => new { r.Name, r.CompanyId }).IsUnique();
+        modelBuilder.Entity<Role>().HasIndex(r => r.Name).IsUnique();
         modelBuilder.Entity<Permission>().HasIndex(p => p.Key).IsUnique();
         modelBuilder.Entity<RefreshToken>().HasIndex(rt => rt.Hash).IsUnique();
     }

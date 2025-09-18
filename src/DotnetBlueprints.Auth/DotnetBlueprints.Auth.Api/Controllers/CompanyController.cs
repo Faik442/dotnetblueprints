@@ -1,12 +1,11 @@
 ﻿using DotnetBlueprints.Auth.Application.Features.Company.Commands.CreateCompany;
-using DotnetBlueprints.Auth.Application.Features.Company.Commands.CreateCompanyRole;
 using DotnetBlueprints.Auth.Application.Features.Company.Commands.DeleteCompany;
 using DotnetBlueprints.Auth.Application.Features.Company.Commands.UpdateCompany;
 using DotnetBlueprints.Auth.Application.Features.Company.Queries.GetCompanies;
 using DotnetBlueprints.Auth.Application.Features.Company.Queries.GetCompanyById;
+using DotnetBlueprints.Auth.Application.Features.Role.Commands.CreateRole;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DotnetBlueprints.Auth.Api.Controllers;
 
@@ -21,6 +20,8 @@ public class CompanyController : ControllerBase
         _mediator = mediator;
     }
 
+    //[Authorize]
+    //[RequirePermission("Company.Create")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost]
@@ -51,7 +52,7 @@ public class CompanyController : ControllerBase
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost("company-role")]
-    public async Task<ActionResult<Guid>> CreateCompanyRole([FromBody] CreateCompanyRoleCommand command)
+    public async Task<ActionResult<Guid>> CreateRole([FromBody] CreateRoleCommand command)
     {
         return await _mediator.Send(command);
     }
@@ -60,7 +61,7 @@ public class CompanyController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPatch("company-role")]
-    public async Task<ActionResult> UpdateCompanyRole([FromBody] UpdateCompanyCommand command)
+    public async Task<ActionResult> UpdateRole([FromBody] UpdateCompanyCommand command)
     {
         await _mediator.Send(command);
         return Ok();
@@ -69,7 +70,7 @@ public class CompanyController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpDelete("company-role")]
-    public async Task<ActionResult> DeleteCompanyRole([FromBody] DeleteCompanyCommand command)
+    public async Task<ActionResult> DeleteRole([FromBody] DeleteCompanyCommand command)
     {
         await _mediator.Send(command);
         return Ok();

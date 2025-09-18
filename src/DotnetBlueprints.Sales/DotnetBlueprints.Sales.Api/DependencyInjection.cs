@@ -12,9 +12,9 @@ public static class DependencyInjection
         {
             options.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "DotnetBlueprints.Sales API",
+                Title = "DotnetBlueprints.Auth API",
                 Version = "v1",
-                Description = "Enterprise-grade sales API with modular structure and best practices."
+                Description = "Enterprise-grade auth API with modular structure and best practices."
             });
         });
 

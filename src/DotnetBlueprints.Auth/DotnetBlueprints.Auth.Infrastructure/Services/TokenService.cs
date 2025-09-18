@@ -15,7 +15,8 @@ public sealed class TokenService : ITokenService
 
     public TokenService(IAuthDbContext db, IOptions<JwtOptions> opt)
     {
-        _db = db; _opt = opt;
+        _db = db;
+        _opt = opt;
     }
 
     /// <summary>
@@ -113,12 +114,10 @@ public sealed class TokenService : ITokenService
         string? jtiOverride = null)
     {
         var scopedRoleIds = await
-             (from ucr in _db.UserCompanyRoles
+             (from ucr in _db.UserRoles
               join r in _db.Roles on ucr.RoleId equals r.Id
               where ucr.UserId == user.Id
-                 && ucr.CompanyId == user.CompanyId
                  && !r.IsDeleted
-                 && (r.CompanyId == user.CompanyId || r.CompanyId == null) 
               select r.Id)
              .Distinct()
              .ToListAsync(ct);
@@ -127,16 +126,18 @@ public sealed class TokenService : ITokenService
         var jti = jtiOverride ?? Guid.NewGuid().ToString("N");
 
         var claims = new List<Claim>
-    {
-        new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-        new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
-        new(ClaimTypes.Email, user.Email ?? string.Empty),
-        new(ClaimTypes.Name, user.DisplayName),
-        new(JwtRegisteredClaimNames.Jti, jti),
-        new("typ","access"),
-        new("company_id", user.CompanyId.ToString())
-    };
+        {
+            new("aud", "dotnetblueprints.auth.api"),
+            new("aud", "dotnetblueprints.sales.api"),
+            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+            new(ClaimTypes.Email, user.Email ?? string.Empty),
+            new(ClaimTypes.Name, user.DisplayName),
+            new(JwtRegisteredClaimNames.Jti, jti),
+            new("typ","access"),
+            new("company_id", user.CompanyId.ToString())
+        };
 
         foreach (var rid in scopedRoleIds)
             claims.Add(new Claim("role_id", rid.ToString()));
@@ -151,7 +152,6 @@ public sealed class TokenService : ITokenService
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var token = new JwtSecurityToken(
             issuer: _opt.Value.Issuer,
-            audience: _opt.Value.Audience,
             claims: claims,
             notBefore: DateTime.UtcNow,
             expires: expUtc,

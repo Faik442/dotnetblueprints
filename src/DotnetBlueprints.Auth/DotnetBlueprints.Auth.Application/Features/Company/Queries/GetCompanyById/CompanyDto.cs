@@ -1,6 +1,8 @@
-﻿namespace DotnetBlueprints.Auth.Application.Features.Company.Queries.GetCompanyById;
+﻿using DotnetBlueprints.Auth.Application.Mappings;
 
-public class CompanyDto
+namespace DotnetBlueprints.Auth.Application.Features.Company.Queries.GetCompanyById;
+
+public class CompanyDto : IMapFrom<Domain.Entities.Company>
 {
     /// <summary>
     /// Gets the id of the company.

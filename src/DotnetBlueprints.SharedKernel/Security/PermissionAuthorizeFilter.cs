@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;                      // GetEndpoint(), StatusCodes
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Controllers;          // ControllerActionDescriptor
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Web.Mvc;
 
 namespace DotnetBlueprints.SharedKernel.Security;
 
@@ -50,10 +49,14 @@ public sealed class PermissionAuthorizeFilter : IAsyncAuthorizationFilter
         var ct = context.HttpContext.RequestAborted;
 
         // --- Build effective permission set by unioning role permissions from cache (strict cache-only) ---
-        var tasks = _currentUser.RoleIds.Select(roleId => _cache.GetPermissionsAsync(companyId, roleId, ct));
+        var tasks = _currentUser.RoleIds.Select(roleId => _cache.GetPermissionsAsync(roleId, ct));
         var sets = await Task.WhenAll(tasks);
 
         var effective = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        
+        // for admin role
+        if (effective.Contains("*")) return;
+        
         foreach (var set in sets)
         {
             if (set is null || set.Count == 0) continue;

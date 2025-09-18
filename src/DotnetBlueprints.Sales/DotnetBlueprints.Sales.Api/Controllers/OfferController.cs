@@ -1,10 +1,15 @@
+using DotnetBlueprints.Sales.Application.DTOs;
 using DotnetBlueprints.Sales.Application.Features.Offers.Commands.Create;
 using DotnetBlueprints.Sales.Application.Features.Offers.Commands.Delete;
 using DotnetBlueprints.Sales.Application.Features.Offers.Commands.Update;
 using DotnetBlueprints.Sales.Application.Features.Offers.Commands.UpdateStatus;
 using DotnetBlueprints.Sales.Application.Features.Offers.Queries.GetById;
+using DotnetBlueprints.Sales.Application.Features.Offers.Queries.SearchOffer;
+using DotnetBlueprints.Sales.Domain.Entities;
+using DotnetBlueprints.SharedKernel.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace DotnetBlueprints.Sales.Api.Controllers;
 
@@ -17,9 +22,13 @@ public class OfferController : ControllerBase
 {
     private readonly IMediator _mediator;
 
-    public OfferController(IMediator mediator)
+    private readonly ICurrentUser _user;
+
+
+    public OfferController(IMediator mediator, ICurrentUser user)
     {
         _mediator = mediator;
+        _user = user;
     }
 
     /// <summary>
@@ -31,7 +40,7 @@ public class OfferController : ControllerBase
     /// <response code="500">An unexpected error occurred.</response>
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [HttpPost("create")]
+    [HttpPost]
     public async Task<ActionResult<Guid>> CreateOffer([FromBody] CreateOfferCommand command)
     {
         var result = await _mediator.Send(command);
@@ -46,7 +55,7 @@ public class OfferController : ControllerBase
     /// <returns>No content if the update is successful; 404 if the offer does not exist.</returns>
     /// <response code="204">Offer updated successfully.</response>
     /// <response code="404">Offer not found.</response>
-    [HttpPut("{id:guid}")]
+    [HttpPatch("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateOffer([FromRoute] Guid id, [FromBody] UpdateOfferCommand command)
@@ -104,4 +113,10 @@ public class OfferController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("search")]
+    public async Task<List<Offer>> SearchOffer([FromBody] SearchOffersQuery query)
+    {
+        query.CompanyId = _user.CompanyId;
+        return await _mediator.Send(query);
+    }
 }

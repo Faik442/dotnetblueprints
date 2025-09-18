@@ -1,5 +1,10 @@
-﻿using DotnetBlueprints.Auth.Infrastructure.Identity;
+﻿using DotnetBlueprints.Auth.Application.Interfaces;
+using DotnetBlueprints.Auth.Infrastructure.Audit;
+using DotnetBlueprints.Auth.Infrastructure.Identity;
 using DotnetBlueprints.Auth.Infrastructure.Persistence;
+using DotnetBlueprints.Auth.Infrastructure.Services;
+using DotnetBlueprints.Elastic.Configuration;
+using DotnetBlueprints.SharedKernel.Audit;
 using DotnetBlueprints.SharedKernel.Infrastructure;
 using DotnetBlueprints.SharedKernel.Redis;
 using DotnetBlueprints.SharedKernel.Security;
@@ -18,15 +23,22 @@ public static class DependencyInjection
 
         services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddScoped<AuditInterceptor>();
-        services.AddSingleton<IConnectionMultiplexer>(sp =>
-        ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")!));
+        services.AddSingleton<IConnectionMultiplexer>(sp => ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")!));
 
-        services.AddScoped<IRolePermissionCache, RedisRolePermissionHashCache>();
+        services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
+        services.AddScoped<IAuditHistoryRepository, AuditHistoryRepository>();
+        services.Configure<ElasticSettings>(configuration.GetSection("ElasticSettings"));
+        services.AddScoped<IRolePermissionCache, RolePermissionCache>();
+        services.AddScoped<IPasswordHasher, AspNetPasswordHasher>();
+        services.AddScoped<ITokenService, TokenService>();
 
-        services.AddDbContext<AuthDbContext>((sp, opt) =>
+        services.AddDbContext<AuthDbContext>((sp, options) =>
         {
-            opt.UseSqlServer(configuration.GetConnectionString("AuthDb"));
-            opt.AddInterceptors(sp.GetRequiredService<AuditInterceptor>());
+            options.UseSqlServer(
+                configuration.GetConnectionString("DotnetBlueprints_Auth"),
+                sql => sql.MigrationsAssembly(typeof(AuthDbContext).Assembly.GetName().Name));
+
+            options.AddInterceptors(sp.GetRequiredService<AuditInterceptor>());
         });
 
         return services;

@@ -50,7 +50,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost("role")]
-    public async Task<ActionResult> AssignRoleToUserInCompany([FromBody] AssignRoleToUserInCompanyCommand command)
+    public async Task<ActionResult> AssignRoleToUserInCompany([FromBody] AssignRoleToUserCommand command)
     {
         await _mediator.Send(command);
         return Ok();
@@ -59,7 +59,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpDelete("role")]
-    public async Task<ActionResult> RemoveRoleFromUserInCompany([FromBody] RemoveRoleFromUserInCompanyCommand command)
+    public async Task<ActionResult> RemoveRoleFromUserInCompany([FromBody] RemoveRoleFromUserCommand command)
     {
         await _mediator.Send(command);
         return Ok();

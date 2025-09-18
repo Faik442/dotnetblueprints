@@ -17,7 +17,6 @@ public interface IRolePermissionCache
     /// Gets the permission set for the given company and role. Returns null on cache miss.
     /// </summary>
     Task<HashSet<string>?> GetPermissionsAsync(
-        Guid companyId,
         Guid roleId,
         CancellationToken cancellationToken = default);
 
@@ -25,7 +24,6 @@ public interface IRolePermissionCache
     /// Sets (overwrites) the permission set for the given company and role.
     /// </summary>
     Task SetPermissionsAsync(
-        Guid companyId,
         Guid roleId,
         HashSet<string> permissions,
         CancellationToken cancellationToken = default);
@@ -34,7 +32,6 @@ public interface IRolePermissionCache
     /// Deletes the cache entry for the given company and role (HDEL on the hash).
     /// </summary>
     Task DeletePermissionsAsync(
-        Guid companyId,
         Guid roleId,
         CancellationToken cancellationToken = default);
 }

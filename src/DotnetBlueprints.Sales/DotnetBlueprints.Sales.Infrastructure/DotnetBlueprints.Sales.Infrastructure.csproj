@@ -9,12 +9,18 @@
   <ItemGroup>
     <PackageReference Include="MassTransit" Version="8.5.1" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.8" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.7" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\DotnetBlueprints.Auth\DotnetBlueprints.Auth.Infrastructure\DotnetBlueprints.Auth.Infrastructure.csproj" />
     <ProjectReference Include="..\..\DotnetBlueprints.SharedKernel\DotnetBlueprints.SharedKernel.csproj" />
     <ProjectReference Include="..\DotnetBlueprints.Sales.Application\DotnetBlueprints.Sales.Application.csproj" />
   </ItemGroup>

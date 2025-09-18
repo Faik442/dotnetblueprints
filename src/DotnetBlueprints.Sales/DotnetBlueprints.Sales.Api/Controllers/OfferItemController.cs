@@ -41,9 +41,9 @@ public class OfferItemController : ControllerBase
     [HttpPut("{offerItemId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid offerItemId, [FromBody] UpdateOfferItemCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateOfferItemCommand command)
     {
-        if (offerItemId != command.OfferItemId)
+        if (id != command.OfferItemId)
             return BadRequest("Route id and payload id do not match.");
 
         await _mediator.Send(command);
