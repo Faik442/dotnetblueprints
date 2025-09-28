@@ -14,7 +14,7 @@ public sealed class User : BaseEntity, IAggregateRoot
     private readonly List<UserRole> _userRoles = new();
 
     private User() { }
-    public User(string email, string displayName, string passwordHash, IEnumerable<Role> roles)
+    public User(Guid companyId, string email, string displayName, string passwordHash, IEnumerable<Role> roles)
     {
         if (string.IsNullOrWhiteSpace(email))
             throw new ArgumentException("Email cannot be empty.", nameof(email));
@@ -23,6 +23,7 @@ public sealed class User : BaseEntity, IAggregateRoot
 
         AddRoles(roles);
 
+        CompanyId = companyId;
         Email = email;
         DisplayName = displayName;
         PasswordHash = passwordHash;
@@ -30,8 +31,8 @@ public sealed class User : BaseEntity, IAggregateRoot
     }
 
     /// <summary>Factory method to create a new user with a precomputed password hash.</summary>
-    public static User Create(string email, string displayName, string passwordHash, IEnumerable<Role> roles)
-        => new User(email, displayName, passwordHash, roles);
+    public static User Create(Guid companyId, string email, string displayName, string passwordHash, IEnumerable<Role> roles)
+        => new User(companyId, email, displayName, passwordHash, roles);
 
     public string Email { get; private set; } = default!;
     public string DisplayName { get; private set; }
@@ -100,19 +101,6 @@ public sealed class User : BaseEntity, IAggregateRoot
         foreach(var role in roles)
         {
             _userRoles.Add(new UserRole(Id, role.Id));
-        }
-    }
-
-    /// <summary>
-    /// Removes roles if present.
-    /// </summary>
-    public void DeleteRoles(List<Guid> roleIds)
-    {
-        var link = _userRoles.Where(r => roleIds.Contains(r.RoleId));
-        if (link is null) return;
-        foreach (var item in link)
-        {
-            IsDeleted = true;
         }
     }
 }

@@ -4,7 +4,9 @@ using DotnetBlueprints.Auth.Application.Features.Company.Commands.UpdateCompany;
 using DotnetBlueprints.Auth.Application.Features.Company.Queries.GetCompanies;
 using DotnetBlueprints.Auth.Application.Features.Company.Queries.GetCompanyById;
 using DotnetBlueprints.Auth.Application.Features.Role.Commands.CreateRole;
+using DotnetBlueprints.SharedKernel.Security;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetBlueprints.Auth.Api.Controllers;
@@ -20,8 +22,8 @@ public class CompanyController : ControllerBase
         _mediator = mediator;
     }
 
-    //[Authorize]
-    //[RequirePermission("Company.Create")]
+    [Authorize]
+    [RequirePermission("Company.Create")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost]
@@ -49,36 +51,9 @@ public class CompanyController : ControllerBase
         return Ok();
     }
 
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [HttpPost("company-role")]
-    public async Task<ActionResult<Guid>> CreateRole([FromBody] CreateRoleCommand command)
-    {
-        return await _mediator.Send(command);
-    }
-
-
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [HttpPatch("company-role")]
-    public async Task<ActionResult> UpdateRole([FromBody] UpdateCompanyCommand command)
-    {
-        await _mediator.Send(command);
-        return Ok();
-    }
-
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [HttpDelete("company-role")]
-    public async Task<ActionResult> DeleteRole([FromBody] DeleteCompanyCommand command)
-    {
-        await _mediator.Send(command);
-        return Ok();
-    }
-
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IReadOnlyList<CompanyDto>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IReadOnlyList<Domain.Entities.Company>))]
     [HttpGet]
-    public async Task<ActionResult<CompanyDto>> GetCompanies([FromBody] GetCompaniesQuery query)
+    public async Task<ActionResult<IReadOnlyList<Domain.Entities.Company>>> GetCompanies([FromBody] GetCompaniesQuery query)
     {
         var result = await _mediator.Send(query);
         return Ok(result);

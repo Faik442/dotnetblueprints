@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DotnetBlueprints.Auth.Infrastructure.Identity;
+﻿namespace DotnetBlueprints.Auth.Infrastructure.Identity;
 
 public sealed class JwtOptions
 {
+    public const string SectionName = "Jwt";
+
     /// <summary>Issuer (iss) claim.</summary>
     public string Issuer { get; set; } = default!;
     /// <summary>Audience (aud) claim.</summary>
-    public string Audience { get; set; } = default!;
+    public string[] Audience { get; set; } = default!;
     /// <summary>Signing key (symmetric).</summary>
     public string SigningKey { get; set; } = default!;
     /// <summary>Access token lifetime (minutes).</summary>

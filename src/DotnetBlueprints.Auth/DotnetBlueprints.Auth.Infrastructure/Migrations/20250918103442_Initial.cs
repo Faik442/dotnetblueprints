@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DotnetBlueprints.Auth.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class initial_v2 : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,7 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Jwt = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    JwtId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    JwtId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -76,8 +76,8 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Key = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
+                    Key = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -97,7 +97,7 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Hash = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Hash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IssuedForJti = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -121,8 +121,8 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -146,10 +146,10 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    DisplayName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -160,7 +160,7 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => new { x.Id, x.CompanyId });
+                    table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Users_Companies_CompanyId",
                         column: x => x.CompanyId,
@@ -194,46 +194,33 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserCompanyRoles",
+                name: "UserRoles",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserCompanyRoles", x => new { x.UserId, x.CompanyId, x.RoleId });
+                    table.PrimaryKey("PK_UserRoles", x => new { x.UserId, x.RoleId });
                     table.ForeignKey(
-                        name: "FK_UserCompanyRoles_Roles_RoleId",
+                        name: "FK_UserRoles_Roles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserCompanyRoles_Users_UserId_CompanyId",
-                        columns: x => new { x.UserId, x.CompanyId },
+                        name: "FK_UserRoles_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumns: new[] { "Id", "CompanyId" },
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AccessTokens_JwtId",
-                table: "AccessTokens",
-                column: "JwtId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Permissions_Key",
                 table: "Permissions",
                 column: "Key",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RefreshTokens_Hash",
-                table: "RefreshTokens",
-                column: "Hash",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -247,15 +234,14 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Roles_Name_CompanyId",
+                name: "IX_Roles_Name",
                 table: "Roles",
-                columns: new[] { "Name", "CompanyId" },
-                unique: true,
-                filter: "[CompanyId] IS NOT NULL");
+                column: "Name",
+                unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserCompanyRoles_RoleId",
-                table: "UserCompanyRoles",
+                name: "IX_UserRoles_RoleId",
+                table: "UserRoles",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
@@ -286,7 +272,7 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                 name: "RolePermissions");
 
             migrationBuilder.DropTable(
-                name: "UserCompanyRoles");
+                name: "UserRoles");
 
             migrationBuilder.DropTable(
                 name: "Permissions");

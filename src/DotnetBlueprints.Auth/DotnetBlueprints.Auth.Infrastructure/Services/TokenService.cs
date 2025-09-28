@@ -148,8 +148,8 @@ public sealed class TokenService : ITokenService
 
     private string SignJwt(IEnumerable<Claim> claims, DateTime expUtc)
     {
-        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_opt.Value.SigningKey));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var keyBytes = Convert.FromBase64String(_opt.Value.SigningKey!);
+        var creds = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256);
         var token = new JwtSecurityToken(
             issuer: _opt.Value.Issuer,
             claims: claims,

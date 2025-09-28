@@ -5,7 +5,7 @@
 namespace DotnetBlueprints.Auth.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class initial_v3 : Migration
+    public partial class Initial_V3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

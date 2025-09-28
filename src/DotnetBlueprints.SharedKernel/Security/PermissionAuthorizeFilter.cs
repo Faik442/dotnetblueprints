@@ -52,8 +52,11 @@ public sealed class PermissionAuthorizeFilter : IAsyncAuthorizationFilter
         var tasks = _currentUser.RoleIds.Select(roleId => _cache.GetPermissionsAsync(roleId, ct));
         var sets = await Task.WhenAll(tasks);
 
-        var effective = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        
+        var effective = sets
+            .Where(s => s is { Count: > 0 })
+            .SelectMany(s => s!)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
         // for admin role
         if (effective.Contains("*")) return;
         

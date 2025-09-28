@@ -41,6 +41,11 @@ public static class DependencyInjection
             options.AddInterceptors(sp.GetRequiredService<AuditInterceptor>());
         });
 
+        services.AddOptions<JwtOptions>()
+            .Bind(configuration.GetSection(JwtOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         return services;
     }
 }

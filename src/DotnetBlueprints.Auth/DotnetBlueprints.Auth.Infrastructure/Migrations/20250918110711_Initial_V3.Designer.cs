@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DotnetBlueprints.Auth.Infrastructure.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20250916091407_initial_v2")]
-    partial class initial_v2
+    [Migration("20250918110711_Initial_V3")]
+    partial class Initial_V3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -56,7 +56,7 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
 
                     b.Property<string>("JwtId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -68,9 +68,6 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("JwtId")
-                        .IsUnique();
 
                     b.ToTable("AccessTokens");
                 });
@@ -132,16 +129,14 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -184,7 +179,7 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
 
                     b.Property<string>("Hash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -210,9 +205,6 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Hash")
-                        .IsUnique();
-
                     b.ToTable("RefreshTokens");
                 });
 
@@ -220,9 +212,6 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CompanyId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreatedBy")
@@ -243,8 +232,7 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -254,11 +242,8 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId");
-
-                    b.HasIndex("Name", "CompanyId")
-                        .IsUnique()
-                        .HasFilter("[CompanyId] IS NOT NULL");
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Roles");
                 });
@@ -281,6 +266,7 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
             modelBuilder.Entity("DotnetBlueprints.Auth.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CompanyId")
@@ -301,13 +287,11 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -322,7 +306,7 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id", "CompanyId");
+                    b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
 
@@ -332,22 +316,19 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("DotnetBlueprints.Auth.Domain.Entities.UserCompanyRole", b =>
+            modelBuilder.Entity("DotnetBlueprints.Auth.Domain.Entities.UserRole", b =>
                 {
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CompanyId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("UserId", "CompanyId", "RoleId");
+                    b.HasKey("UserId", "RoleId");
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserCompanyRoles");
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("DotnetBlueprints.SharedKernel.Audit.AuditHistory", b =>
@@ -390,13 +371,6 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                     b.ToTable("AuditHistories");
                 });
 
-            modelBuilder.Entity("DotnetBlueprints.Auth.Domain.Entities.Role", b =>
-                {
-                    b.HasOne("DotnetBlueprints.Auth.Domain.Entities.Company", null)
-                        .WithMany("Roles")
-                        .HasForeignKey("CompanyId");
-                });
-
             modelBuilder.Entity("DotnetBlueprints.Auth.Domain.Entities.RolePermission", b =>
                 {
                     b.HasOne("DotnetBlueprints.Auth.Domain.Entities.Permission", "Permission")
@@ -427,17 +401,17 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("DotnetBlueprints.Auth.Domain.Entities.UserCompanyRole", b =>
+            modelBuilder.Entity("DotnetBlueprints.Auth.Domain.Entities.UserRole", b =>
                 {
                     b.HasOne("DotnetBlueprints.Auth.Domain.Entities.Role", "Role")
-                        .WithMany()
+                        .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DotnetBlueprints.Auth.Domain.Entities.User", "User")
-                        .WithMany("UserCompanyRoles")
-                        .HasForeignKey("UserId", "CompanyId")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -449,8 +423,6 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
             modelBuilder.Entity("DotnetBlueprints.Auth.Domain.Entities.Company", b =>
                 {
                     b.Navigation("Members");
-
-                    b.Navigation("Roles");
                 });
 
             modelBuilder.Entity("DotnetBlueprints.Auth.Domain.Entities.Permission", b =>
@@ -461,11 +433,13 @@ namespace DotnetBlueprints.Auth.Infrastructure.Migrations
             modelBuilder.Entity("DotnetBlueprints.Auth.Domain.Entities.Role", b =>
                 {
                     b.Navigation("RolePermissions");
+
+                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("DotnetBlueprints.Auth.Domain.Entities.User", b =>
                 {
-                    b.Navigation("UserCompanyRoles");
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

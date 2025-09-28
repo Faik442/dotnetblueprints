@@ -14,12 +14,11 @@ public sealed class RemoveRoleFromUserInCompanyCommandHandler : IRequestHandler<
 
     public async Task Handle(RemoveRoleFromUserCommand req, CancellationToken ct)
     {
-        var membership = await _db.Users
-            .Include(uc => uc.UserRoles)
-            .FirstOrDefaultAsync(uc => uc.Id == req.UserId, ct)
+        var userRoles = await _db.UserRoles
+            .FirstOrDefaultAsync(ur => ur.UserId == req.UserId && req.RoleIds.Contains(ur.RoleId), ct)
             ?? throw new KeyNotFoundException("Membership not found.");
 
-        membership.DeleteRoles(req.RoleIds);
+        _db.UserRoles.RemoveRange(userRoles);
         await _db.SaveChangesAsync(ct);
     }
 }

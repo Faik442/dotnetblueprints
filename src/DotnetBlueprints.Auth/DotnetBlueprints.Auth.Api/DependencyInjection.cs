@@ -13,21 +13,20 @@ public static class DependencyInjection
         services.AddEndpointsApiExplorer();
 
         var audiences = configuration.GetSection("Jwt:Audiences").Get<string[]>();
-
+        var keyBytes = Convert.FromBase64String(configuration["Jwt:SigningKey"]!);
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(opt =>
         {
             opt.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = true,
+                ValidateIssuer = false,
                 ValidIssuer = configuration["Jwt:Issuer"],
-                ValidateAudience = true,
+                ValidateAudience = false,
                 ValidAudiences = audiences,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)),
+                IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
                 ClockSkew = TimeSpan.Zero
             };
         });

@@ -1,13 +1,6 @@
 ﻿using DotnetBlueprints.Auth.Application.Interfaces;
-using DotnetBlueprints.Auth.Domain.Entities;
 using FluentValidation;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DotnetBlueprints.Auth.Application.Features.User.Commands.AddUserToCompany;
 
@@ -31,11 +24,12 @@ public sealed class AddUserToCompanyCommandHandler : IRequestHandler<AddUserToCo
 
         var roles = _db.Roles.Where(x => req.RoleIds.Contains(x.Id));
 
-        var membership = Domain.Entities.User.Create(req.Email, req.DisplayName, _hasher.Hash(req.Password), roles);
+        var user = Domain.Entities.User.Create(req.CompanyId, req.Email, req.DisplayName, _hasher.Hash(req.Password), roles);
+        _db.Users.Add(user);
 
         await _db.SaveChangesAsync(ct);
 
-        return membership.Id;
+        return user.Id;
     }
 }
 

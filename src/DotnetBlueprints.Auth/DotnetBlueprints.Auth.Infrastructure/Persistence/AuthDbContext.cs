@@ -35,21 +35,29 @@ public sealed class AuthDbContext : DbContext, IAuthDbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // === Composite Keys ===
-        modelBuilder.Entity<RolePermission>()
-            .HasKey(rp => new { rp.RoleId, rp.PermissionId });
+        // === Keys ===
+        modelBuilder.Entity<User>().HasKey(u => u.Id);
+        modelBuilder.Entity<Role>().HasKey(r => r.Id);
+        modelBuilder.Entity<Permission>().HasKey(p => p.Id);
+        modelBuilder.Entity<Company>().HasKey(p => p.Id);
+        modelBuilder.Entity<UserRole>().HasKey(ur => new { ur.UserId, ur.RoleId });
+        modelBuilder.Entity<RolePermission>().HasKey(rp => new { rp.RoleId, rp.PermissionId });
+
+        // === Relations ===
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.Company)
+            .WithMany(c => c.Members)
+            .HasForeignKey(u => u.CompanyId);
 
         modelBuilder.Entity<UserRole>()
-            .HasKey(ucr => new { ucr.UserId, ucr.RoleId });
+            .HasOne(ur => ur.User)
+            .WithMany(u => u.UserRoles)
+            .HasForeignKey(ur => ur.UserId);
 
-        // === Relationships ===
-        modelBuilder.Entity<User>()
-            .HasKey(uc => new { uc.Id, uc.CompanyId });
-
-        modelBuilder.Entity<User>()
-            .HasMany(uc => uc.UserRoles)
-            .WithOne(ucr => ucr.User)
-            .HasForeignKey(ucr => new { ucr.UserId });
+        modelBuilder.Entity<UserRole>()
+            .HasOne(ur => ur.Role)
+            .WithMany(r => r.UserRoles)
+            .HasForeignKey(ur => ur.RoleId);
 
         modelBuilder.Entity<RolePermission>()
             .HasOne(rp => rp.Role)
@@ -58,43 +66,24 @@ public sealed class AuthDbContext : DbContext, IAuthDbContext
 
         modelBuilder.Entity<RolePermission>()
             .HasOne(rp => rp.Permission)
-            .WithMany(r => r.RolePermissions)
+            .WithMany(p => p.RolePermissions)
             .HasForeignKey(rp => rp.PermissionId);
 
-        // === Token Config ===
-        modelBuilder.Entity<RefreshToken>()
-            .HasIndex(rt => rt.Hash)
-            .IsUnique();
+        // === Index/constraints ===
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email).IsUnique(); // İstersen (CompanyId, Email) unique de yapabilirsin
 
-        modelBuilder.Entity<AccessToken>()
-            .HasIndex(at => at.JwtId)
-            .IsUnique();
+        modelBuilder.Entity<Role>()
+            .HasIndex(r => r.Name).IsUnique();   // Global benzersiz
 
-        // === String lengths (optional, best practice) ===
-        modelBuilder.Entity<User>(e =>
-        {
-            e.Property(u => u.Email).HasMaxLength(256).IsRequired();
-            e.Property(u => u.DisplayName).HasMaxLength(256);
-        });
+        modelBuilder.Entity<Permission>()
+            .HasIndex(p => p.Key).IsUnique();
 
-        modelBuilder.Entity<Permission>(e =>
-        {
-            e.Property(p => p.Key).HasMaxLength(128).IsRequired();
-            e.Property(p => p.Description).HasMaxLength(512);
-        });
-
-        modelBuilder.Entity<Role>(e =>
-        {
-            e.Property(r => r.Name).HasMaxLength(128).IsRequired();
-        });
-
+        // === Soft-delete filtreleri (varsa)
         modelBuilder.Entity<User>().HasQueryFilter(x => !x.IsDeleted);
         modelBuilder.Entity<Role>().HasQueryFilter(x => !x.IsDeleted);
         modelBuilder.Entity<Permission>().HasQueryFilter(x => !x.IsDeleted);
         modelBuilder.Entity<Company>().HasQueryFilter(x => !x.IsDeleted);
-        modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
-        modelBuilder.Entity<Role>().HasIndex(r => r.Name).IsUnique();
-        modelBuilder.Entity<Permission>().HasIndex(p => p.Key).IsUnique();
-        modelBuilder.Entity<RefreshToken>().HasIndex(rt => rt.Hash).IsUnique();
+
     }
 }

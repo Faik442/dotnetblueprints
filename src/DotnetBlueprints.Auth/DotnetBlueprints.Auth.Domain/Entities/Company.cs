@@ -13,7 +13,6 @@ namespace DotnetBlueprints.Auth.Domain.Entities;
 public sealed class Company : BaseEntity, IAggregateRoot
 {
     private readonly List<User> _members = new();
-    private readonly List<Role> _roles = new();
 
     private Company() { }
 
@@ -34,11 +33,6 @@ public sealed class Company : BaseEntity, IAggregateRoot
     /// Gets the collection of company members.
     /// </summary>
     public IReadOnlyCollection<User> Members => _members;
-
-    /// <summary>
-    /// Gets the collection of roles defined in the company scope.
-    /// </summary>
-    public IReadOnlyCollection<Role> Roles => _roles;
 
     /// <summary>
     /// Factory method for creating a new company instance.
@@ -63,19 +57,4 @@ public sealed class Company : BaseEntity, IAggregateRoot
     /// Marks the company as soft deleted.
     /// </summary>
     public void Delete() => IsDeleted = true;
-
-    /// <summary>
-    /// Adds a new role to the company with the specified permissions.
-    /// </summary>
-    public Role AddRole(string roleName, IEnumerable<Guid> permissionIds)
-    {
-        if (_roles.Any(r => r.Name.Equals(roleName, StringComparison.OrdinalIgnoreCase)))
-            throw new InvalidOperationException($"Role {roleName} already exists in company {Name}");
-
-        var role = new Role(roleName);
-        role.AddPermissions(permissionIds);
-
-        _roles.Add(role);
-        return role;
-    }
 }

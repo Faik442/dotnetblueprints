@@ -17,7 +17,6 @@ namespace DotnetBlueprints.Auth.Application.Features.Role.Commands.CreateRole;
 /// Command to add a role with permissions to a company.
 /// </summary>
 public sealed record CreateRoleCommand(
-    Guid CompanyId,
     string RoleName,
     IEnumerable<Guid> Permissions
 ) : IRequest<Guid>;
@@ -40,12 +39,6 @@ public sealed class CreateCompanyRoleCommandHandler : IRequestHandler<CreateRole
 
     public async Task<Guid> Handle(CreateRoleCommand request, CancellationToken cancellationToken)
     {
-        var company = await _context.Companies
-            .Include(c => c.Roles)
-            .ThenInclude(r => r.RolePermissions)
-            .FirstOrDefaultAsync(c => c.Id == request.CompanyId, cancellationToken)
-            ?? throw new NotFoundException(nameof(Company), request.CompanyId);
-
         var perms = await _context.Permissions.Where(x => request.Permissions.Contains(x.Id)).ToListAsync();
 
         if (perms is null)
@@ -53,8 +46,8 @@ public sealed class CreateCompanyRoleCommandHandler : IRequestHandler<CreateRole
             throw new ValidationException("Permissions not matched with db.");
         }
 
-        var role = company.AddRole(request.RoleName, perms.Select(x => x.Id));
-
+        var role = new Domain.Entities.Role(request.RoleName, request.Permissions);
+        _context.Roles.Add(role);
         await _context.SaveChangesAsync(cancellationToken);
 
         var finalSet = perms

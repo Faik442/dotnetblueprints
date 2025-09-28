@@ -4,7 +4,9 @@ using DotnetBlueprints.Auth.Application.Features.User.Commands.AssignRoleToUserI
 using DotnetBlueprints.Auth.Application.Features.User.Commands.RemoveRoleFromUserInCompany;
 using DotnetBlueprints.Auth.Application.Features.User.Commands.RemoveUserFromCompany;
 using DotnetBlueprints.Auth.Application.Features.User.Commands.UpdateUserProfile;
+using DotnetBlueprints.SharedKernel.Security;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +23,8 @@ public class UserController : ControllerBase
         _mediator = mediator;
     }
 
+    [Authorize]
+    [RequirePermission("User.Create")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost]
@@ -47,6 +51,8 @@ public class UserController : ControllerBase
         return Ok();
     }
 
+    [Authorize]
+    [RequirePermission("User.AssignRole")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost("role")]

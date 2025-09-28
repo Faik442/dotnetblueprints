@@ -6,7 +6,7 @@ namespace DotnetBlueprints.Auth.Application.Features.Company.Commands.CreateComp
 /// <summary>
 /// Command to create a new company.
 /// </summary>
-public sealed record CreateCompanyCommand(string Name, string CreatedBy) : IRequest<Guid>;
+public sealed record CreateCompanyCommand(string Name) : IRequest<Guid>;
 
 /// <summary>
 /// Handles company creation.

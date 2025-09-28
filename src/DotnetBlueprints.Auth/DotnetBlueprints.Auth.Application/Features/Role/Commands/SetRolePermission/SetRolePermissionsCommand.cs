@@ -42,7 +42,7 @@ public sealed class SetRolePermissionsCommandHandler : IRequestHandler<SetRolePe
 
     public async Task<Unit> Handle(SetRolePermissionsCommand request, CancellationToken ct)
     {
-        var role = _context.Roles.Where(x => x.Id == request.RoleId).First();
+        var role = _context.Roles.Include(x => x.RolePermissions).Where(x => x.Id == request.RoleId).First();
         if (role is null)
             throw new KeyNotFoundException($"Role : {request.RoleId}");
 
@@ -65,16 +65,12 @@ public sealed class SetRolePermissionsCommandHandler : IRequestHandler<SetRolePe
 
         if (toAdd.Length > 0)
         {
-            role.AddPermissions(toAdd.ToList());
+            role.AddPermissions(toAdd);
         }
 
         if (toRemove.Length > 0)
         {
-            var linksToRemove = role.RolePermissions
-                .Where(rp => toRemove.Contains(rp.PermissionId))
-                .ToList();
-
-            _context.RolePermissions.RemoveRange(linksToRemove);
+            role.RemovePermissions(toRemove);
         }
 
         await _context.SaveChangesAsync(ct);

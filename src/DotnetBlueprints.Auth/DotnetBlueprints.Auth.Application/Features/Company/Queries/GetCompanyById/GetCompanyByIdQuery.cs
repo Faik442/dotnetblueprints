@@ -33,9 +33,10 @@ public sealed class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQ
     public async Task<CompanyDto> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
     {
         var company = await _context.Companies
-            .Include(c => c.Roles)
-            .ThenInclude(r => r.RolePermissions)
-            .ThenInclude(rp => rp.Permission)
+            .Include(c => c.Members)
+            .ThenInclude(ur => ur.UserRoles)
+            .ThenInclude(r => r.Role)
+            .ThenInclude(rp => rp.RolePermissions)
             .FirstOrDefaultAsync(c => c.Id == request.CompanyId, cancellationToken)
             ?? throw new NotFoundException(nameof(Company), request.CompanyId);
 
